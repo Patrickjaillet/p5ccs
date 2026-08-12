@@ -1,0 +1,33 @@
+<Project>
+
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <LangVersion>12.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Platforms>x64;ARM64</Platforms>
+    <RuntimeIdentifiers>win-x64;win-arm64</RuntimeIdentifiers>
+    <Deterministic>true</Deterministic>
+    <NeutralLanguage>en</NeutralLanguage>
+  </PropertyGroup>
+
+  <PropertyGroup Label="SemVer">
+    <VersionPrefix>0.1.0</VersionPrefix>
+    <VersionSuffix></VersionSuffix>
+    <AssemblyVersion>0.1.0.0</AssemblyVersion>
+    <FileVersion>0.1.0.0</FileVersion>
+    <InformationalVersion Condition="'$(VersionSuffix)' == ''">$(VersionPrefix)</InformationalVersion>
+    <InformationalVersion Condition="'$(VersionSuffix)' != ''">$(VersionPrefix)-$(VersionSuffix)</InformationalVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Product Metadata">
+    <Product>Processing 5 - Creative Coding Station</Product>
+    <Company>Patrick JAILLET</Company>
+    <Authors>Patrick JAILLET</Authors>
+    <Copyright>Copyright (c) 2026 Patrick JAILLET</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/Patrickjaillet/p5ccs</RepositoryUrl>
+    <PackageProjectUrl>https://patrickjaillet.github.io/p5ccs</PackageProjectUrl>
+  </PropertyGroup>
+
+</Project>

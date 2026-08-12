@@ -1,0 +1,42 @@
+## .NET / Visual Studio standard
+bin/
+obj/
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Build / publish output
+publish/
+TestResults/
+artifacts/
+out/
+
+## Rider / VS Code
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+
+## Project-internal documents (never published to GitHub)
+CLAUDE.md
+ROADMAP.md
+
+## OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+## NuGet
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+
+## Logs
+*.log
+logs/
+
+## Installer output
+installers/windows/Output/

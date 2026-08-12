@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    name: Build & Test (${{ matrix.arch }})
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [ x64, ARM64 ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore
+        run: dotnet restore P5CCS.sln
+
+      - name: Build
+        run: dotnet build P5CCS.sln --configuration Release --no-restore -p:Platform=${{ matrix.arch }}
+
+      - name: Test
+        if: matrix.arch == 'x64'
+        run: dotnet test P5CCS.sln --configuration Release --no-build -p:Platform=${{ matrix.arch }} --logger "trx;LogFileName=test-results.trx"
+
+      - name: Upload test results
+        if: matrix.arch == 'x64' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: '**/test-results.trx'

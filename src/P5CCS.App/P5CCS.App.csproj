@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WPF-UI" Version="3.0.5" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2792.45" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\P5CCS.Core\P5CCS.Core.csproj" />
+    <ProjectReference Include="..\P5CCS.Engine\P5CCS.Engine.csproj" />
+    <ProjectReference Include="..\P5CCS.Editor\P5CCS.Editor.csproj" />
+    <ProjectReference Include="..\P5CCS.Export\P5CCS.Export.csproj" />
+  </ItemGroup>
+
+</Project>
