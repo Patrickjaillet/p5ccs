@@ -44,4 +44,55 @@ public class JsBraceFoldingStrategyTests
 
         Assert.Null(exception);
     }
+
+    [Fact]
+    public void CreateNewFoldings_MismatchedBracketTypes_DoesNotProduceSpuriousLargeFolding()
+    {
+        var document = new TextDocument(
+            "function draw() {\n" +
+            "  background(30);\n" +
+            "  fill(0kkopkpokpok\n" +
+            "\n" +
+            "okpokpokpok\n" +
+            "\n" +
+            "pijpjp\n" +
+            "ke();\n" +
+            "  circle(x, y, 40);\n" +
+            "}\n");
+
+        var foldings = JsBraceFoldingStrategy.CreateNewFoldings(document).ToList();
+
+        Assert.All(foldings, folding =>
+        {
+            var startLine = document.GetLineByOffset(folding.StartOffset).LineNumber;
+            var endLine = document.GetLineByOffset(folding.EndOffset).LineNumber;
+            Assert.True(endLine - startLine <= document.LineCount, "Folding should not span more lines than the document contains.");
+        });
+
+        var outerFolding = Assert.Single(foldings);
+        var outerStartLine = document.GetLineByOffset(outerFolding.StartOffset).LineNumber;
+        var outerEndLine = document.GetLineByOffset(outerFolding.EndOffset).LineNumber;
+        Assert.Equal(1, outerStartLine);
+        Assert.Equal(document.LineCount - 1, outerEndLine);
+    }
+
+    [Fact]
+    public void CreateNewFoldings_BracketsInsideStringLiteral_AreIgnored()
+    {
+        var document = new TextDocument("function label() {\n  text(\"[not a fold] {nope}\", 0, 0);\n}\n");
+
+        var foldings = JsBraceFoldingStrategy.CreateNewFoldings(document).ToList();
+
+        Assert.Single(foldings);
+    }
+
+    [Fact]
+    public void CreateNewFoldings_BracketsInsideLineComment_AreIgnored()
+    {
+        var document = new TextDocument("function noop() {\n  // stray brace {\n  return;\n}\n");
+
+        var foldings = JsBraceFoldingStrategy.CreateNewFoldings(document).ToList();
+
+        Assert.Single(foldings);
+    }
 }

@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-08-12
+
+### Fixed
+
+- **Blank/white rendering at normal window size**: on this environment's
+  display/compositor, WPF only ever produced a correct full-tree layout and
+  paint pass for the main window while it was in the `Maximized` state —
+  `Normal` (restored) window state, at any size, reliably left the
+  AvalonEdit `TextView` and the Sliders/Console `TabControl` unpainted
+  beyond the first couple of lines, with the underlying data confirmed
+  correct via UI Automation. Removing the `Mica` backdrop and forcing a
+  programmatic maximize/restore layout pass did not change this: the
+  problem tracks `WindowState` itself, not window size, backdrop, or
+  invalidation. `MainWindow` now starts `Maximized` by default
+  (`MainWindow.xaml`), which reliably avoids the broken state on launch.
+- **Phantom code-folding covering large valid code regions while typing**:
+  `JsBraceFoldingStrategy` matched `{`/`[` openers against `}`/`]` closers
+  on a single stack without checking the bracket type, and did not skip
+  string/template-literal or comment content. Transiently unbalanced code
+  while typing (e.g. an unclosed `fill(` call) could pop an unrelated
+  opening brace from deep inside real code, producing a wildly incorrect
+  folding range that AvalonEdit then rendered as a large blank/collapsed
+  gap in the middle of the editor — this was the actual cause of a second,
+  distinct report of the editor appearing to "mask" its own content even
+  with the window maximized. The strategy now tracks bracket type per
+  stack entry and skips string/template-literal/line-comment/block-comment
+  content while scanning.
+- 3 new unit tests for the folding fix (52 tests solution-wide).
+
 ## [0.6.0] - 2026-08-12
 
 ### Added

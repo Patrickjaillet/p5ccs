@@ -13,6 +13,7 @@
                  x:Name="RootWindow"
                  Title="Processing 5 - Creative Coding Station"
                  Height="720" Width="1200"
+                 WindowState="Maximized"
                  ExtendsContentIntoTitleBar="True"
                  WindowBackdropType="Mica"
                  WindowCornerPreference="Round">
