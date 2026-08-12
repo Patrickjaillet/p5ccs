@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-08-12
+
+### Added
+
+- Fluent visual theme (`ui:FluentWindow`, Mica backdrop, rounded corners,
+  configurable accent color via `IThemeService`/`WpfThemeService`).
+- Main window shell: custom `TitleBar`, full menu bar (File, Edit, View,
+  Sketch, Export, Window, Help), toolbar (Run/Pause/Stop/Reset/Export) with
+  Fluent `SymbolIcon`s.
+- Dockable, resizable panel system via AvalonDock (`Dirkster.AvalonDock`)
+  themed with `AvalonDock.Themes.WPFUI`: Explorer/Sliders/Console
+  anchorable panels plus a multi-tab sketch document pane (open/close/reorder).
+- Light/Dark/System theme selector wired to `ApplicationThemeManager`.
+- Configurable global keyboard shortcuts (`IKeyBindingsService`) with
+  persisted gesture mapping, applied dynamically to the main window.
+- Native dialog service (`IDialogService`/`WpfDialogService`) using
+  `Microsoft.Win32.OpenFileDialog`/`SaveFileDialog`/`OpenFolderDialog`.
+- Branded startup splash screen shown while the DI container and theme
+  initialize.
+- Status bar with engine status, FPS, and mouse position placeholders
+  (wired for real data once the WebView2 engine lands).
+- Unit tests for `KeyBindingsService`.
+
 ## [0.2.0] - 2026-08-12
 
 ### Added
@@ -46,6 +69,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Repository governance files: `LICENSE` (MIT), `CONTRIBUTING.md`,
   `CODE_OF_CONDUCT.md`, issue and pull request templates.
 
-[Unreleased]: https://github.com/Patrickjaillet/p5ccs/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/Patrickjaillet/p5ccs/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/Patrickjaillet/p5ccs/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/Patrickjaillet/p5ccs/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/Patrickjaillet/p5ccs/releases/tag/v0.1.0

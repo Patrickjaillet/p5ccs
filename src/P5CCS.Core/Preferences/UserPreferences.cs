@@ -9,4 +9,6 @@ public sealed class UserPreferences
     public string? LastProjectPath { get; set; }
 
     public string? PanelLayout { get; set; }
+
+    public string AccentColorHex { get; set; } = "#0078D4";
 }
