@@ -3,8 +3,6 @@ using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Shapes;
 using Microsoft.Web.WebView2.Core;
 using P5CCS.Engine.Http;
 
@@ -14,7 +12,6 @@ public partial class SketchViewport : UserControl, IP5jsEngineHost, IDisposable
 {
     private const double MinZoom = 0.25;
     private const double MaxZoom = 4.0;
-    private const double GridSpacing = 50;
 
     private readonly LocalSketchServer _server;
     private string _source = string.Empty;
@@ -22,6 +19,8 @@ public partial class SketchViewport : UserControl, IP5jsEngineHost, IDisposable
     private bool _isPaused;
     private bool _isInitialized;
     private bool _isDisposed;
+    private double _fitScale = 1.0;
+    private double _userZoomMultiplier = 1.0;
 
     public SketchViewport()
     {
@@ -48,17 +47,6 @@ public partial class SketchViewport : UserControl, IP5jsEngineHost, IDisposable
     {
         get => (bool)GetValue(ShowGridProperty);
         set => SetValue(ShowGridProperty, value);
-    }
-
-    public double Zoom
-    {
-        get => ZoomTransform.ScaleX;
-        set
-        {
-            var clamped = Math.Clamp(value, MinZoom, MaxZoom);
-            ZoomTransform.ScaleX = clamped;
-            ZoomTransform.ScaleY = clamped;
-        }
     }
 
     public void LoadSketch(string source)
@@ -140,7 +128,7 @@ public partial class SketchViewport : UserControl, IP5jsEngineHost, IDisposable
         _server.Start();
         await WebView.EnsureCoreWebView2Async();
         WebView.CoreWebView2.WebMessageReceived += OnWebMessageReceived;
-        DrawGrid();
+        UpdateFitScale(new Size(ViewportContainer.ActualWidth, ViewportContainer.ActualHeight));
     }
 
     public void Dispose()
@@ -210,16 +198,16 @@ public partial class SketchViewport : UserControl, IP5jsEngineHost, IDisposable
             {
                 case "ready":
                     IsReady = true;
-                    Dispatcher.Invoke(() => Ready?.Invoke(this, EventArgs.Empty));
+                    Dispatcher.Invoke(() =>
+                    {
+                        Ready?.Invoke(this, EventArgs.Empty);
+                        PostCommand("showGrid", ShowGrid);
+                    });
                     break;
 
                 case "fps":
                     var fps = document.RootElement.GetProperty("value").GetDouble();
-                    Dispatcher.Invoke(() =>
-                    {
-                        FpsOverlay.Text = $"{fps:0} FPS";
-                        FpsChanged?.Invoke(this, fps);
-                    });
+                    Dispatcher.Invoke(() => FpsChanged?.Invoke(this, fps));
                     break;
 
                 case "mouse":
@@ -245,50 +233,43 @@ public partial class SketchViewport : UserControl, IP5jsEngineHost, IDisposable
             return;
         }
 
-        Zoom += e.Delta > 0 ? 0.1 : -0.1;
+        _userZoomMultiplier = Math.Clamp(_userZoomMultiplier + (e.Delta > 0 ? 0.1 : -0.1), MinZoom, MaxZoom);
+        ApplyZoom();
         e.Handled = true;
     }
 
     private static void OnShowGridChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
-        ((SketchViewport)d).DrawGrid();
+        var viewport = (SketchViewport)d;
+        if (viewport._isNavigated)
+        {
+            viewport.PostCommand("showGrid", (bool)e.NewValue);
+        }
     }
 
-    private void DrawGrid()
-    {
-        OverlayCanvas.Children.Clear();
+    private void OnContainerSizeChanged(object sender, SizeChangedEventArgs e) => UpdateFitScale(e.NewSize);
 
-        if (!ShowGrid)
+    private void UpdateFitScale(Size available)
+    {
+        if (available.Width <= 0 || available.Height <= 0 || RenderRoot.Width <= 0 || RenderRoot.Height <= 0)
         {
             return;
         }
 
-        var brush = new SolidColorBrush(Color.FromArgb(60, 255, 255, 255));
-
-        for (double x = 0; x <= 800; x += GridSpacing)
+        var scale = Math.Min(available.Width / RenderRoot.Width, available.Height / RenderRoot.Height);
+        if (double.IsNaN(scale) || double.IsInfinity(scale) || scale <= 0)
         {
-            OverlayCanvas.Children.Add(new Line
-            {
-                X1 = x,
-                Y1 = 0,
-                X2 = x,
-                Y2 = 450,
-                Stroke = brush,
-                StrokeThickness = 1,
-            });
+            scale = 1.0;
         }
 
-        for (double y = 0; y <= 450; y += GridSpacing)
-        {
-            OverlayCanvas.Children.Add(new Line
-            {
-                X1 = 0,
-                Y1 = y,
-                X2 = 800,
-                Y2 = y,
-                Stroke = brush,
-                StrokeThickness = 1,
-            });
-        }
+        _fitScale = scale;
+        ApplyZoom();
+    }
+
+    private void ApplyZoom()
+    {
+        var effective = Math.Clamp(_fitScale * _userZoomMultiplier, MinZoom, MaxZoom);
+        ZoomTransform.ScaleX = effective;
+        ZoomTransform.ScaleY = effective;
     }
 }

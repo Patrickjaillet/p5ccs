@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.3] - 2026-08-12
+
+### Fixed
+
+- **Viewport FPS counter and grid overlay were invisible**: both were WPF
+  elements (`TextBlock` / `Canvas`) layered as siblings of the `WebView2`
+  control inside the same `Grid`. `WebView2` hosts its content in a
+  native child surface that always composites on top of ordinary WPF
+  visuals regardless of XAML z-order ("airspace"), so neither overlay
+  could ever actually be seen. Both are now rendered inside the WebView's
+  own HTML page instead (`index.html` / `bridge.js`): a `#hud-fps` div and
+  a `#hud-grid` canvas, sized/positioned to track the real sketch canvas
+  via `getBoundingClientRect`, both drawn by the browser itself and
+  therefore always on top of the sketch's own canvas content. The C#
+  `ShowGrid` property now posts a `showGrid` bridge command instead of
+  drawing locally, and re-sends its current state on every page `ready`
+  so the grid survives a sketch reload.
+- **Viewport did not shrink to fit its pane on window resize**: the
+  render surface was a fixed 800x450 `Grid` with only a manual
+  Ctrl+scroll-wheel zoom; shrinking the containing pane just revealed
+  scrollbars instead of scaling the content down. The viewport now
+  recomputes a fit-to-container scale on every `SizeChanged` of its
+  container and applies it through the existing `ScaleTransform`,
+  combined multiplicatively with the manual zoom so Ctrl+scroll still
+  works as a zoom-beyond-fit gesture.
+
 ## [0.6.2] - 2026-08-12
 
 ### Fixed
