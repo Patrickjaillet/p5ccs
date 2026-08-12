@@ -5,15 +5,20 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:editor="clr-namespace:P5CCS.Editor;assembly=P5CCS.Editor"
              xmlns:engine="clr-namespace:P5CCS.Engine;assembly=P5CCS.Engine"
+             xmlns:views="clr-namespace:P5CCS.App.Views"
+             xmlns:vm="clr-namespace:P5CCS.App.ViewModels"
              mc:Ignorable="d"
              Loaded="OnLoaded"
              Unloaded="OnUnloaded"
-             d:DesignHeight="450" d:DesignWidth="900">
+             d:DataContext="{d:DesignInstance Type=vm:SketchTabViewModel}"
+             d:DesignHeight="450" d:DesignWidth="1200">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" MinWidth="200" />
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" MinWidth="300" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="300" MinWidth="240" />
         </Grid.ColumnDefinitions>
 
         <editor:SketchCodeEditor x:Name="CodeEditor" Grid.Column="0" />
@@ -25,5 +30,30 @@
                       Background="#33808080" />
 
         <engine:SketchViewport x:Name="Viewport" Grid.Column="2" />
+
+        <GridSplitter Grid.Column="3"
+                      Width="4"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch"
+                      Background="#33808080" />
+
+        <TabControl Grid.Column="4">
+            <TabItem Header="Sliders">
+                <views:SlidersPanel DataContext="{Binding SlidersPanel}" />
+            </TabItem>
+            <TabItem Header="Console">
+                <ListBox ItemsSource="{Binding ConsoleLines}"
+                         FontFamily="Consolas"
+                         FontSize="12"
+                         BorderThickness="0"
+                         ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Padding" Value="4,1" />
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
+            </TabItem>
+        </TabControl>
     </Grid>
 </UserControl>

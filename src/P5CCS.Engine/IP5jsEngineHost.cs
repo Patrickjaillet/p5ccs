@@ -2,7 +2,7 @@ using System.Windows;
 
 namespace P5CCS.Engine;
 
-public interface IP5jsEngineHost
+public interface IP5jsEngineHost : IDisposable
 {
     bool IsReady { get; }
 
@@ -25,6 +25,8 @@ public interface IP5jsEngineHost
     void Reset();
 
     void SetFrameRate(int framesPerSecond);
+
+    void SetGlobalNumber(string name, double value);
 
     Task<byte[]> CaptureScreenshotPngAsync();
 }

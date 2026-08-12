@@ -7,6 +7,63 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-08-12
+
+### Added
+
+- `SketchSourceAnalyzer` (`P5CCS.Core`): lightweight static analysis of the
+  sketch source detecting top-level numeric/boolean variable declarations
+  (brace-depth tracked, so nested/function-local declarations are correctly
+  excluded), `fill()`/`stroke()`/`background()` literal RGB calls, and
+  `// @slider min max [step]` / `// @slider enum a, b, c` annotations that
+  override inferred bounds or force an enum control. Contextual bound
+  inference (angle/opacity name heuristics, symmetric/positive-value
+  fallback).
+- Dynamically generated sliders panel (`SlidersPanelViewModel`,
+  `SliderItemViewModel`) with per-kind controls: `Slider` for numbers,
+  `ui:ToggleSwitch` for booleans, an R/G/B slider triplet with a live color
+  swatch for `fill`/`stroke`/`background` calls, and a `ComboBox` for
+  `@slider enum`-annotated variables. Sliders are grouped by detected
+  category (a preceding `//` comment, or `Variables`/`Colors`/`Flags`) in
+  collapsible `Expander` sections.
+- Live bidirectional binding: dragging a slider rewrites the exact source
+  span in the sketch (debounced) and hot-reloads the running engine; editing
+  the code in AvalonEdit re-analyzes and refreshes the sliders, preserving
+  per-slider bound overrides and animation state where the same
+  name/kind still exists.
+- Manual bounds override per slider (min/max fields + "Set" button).
+- Programmable slider animation (`SliderAnimator`: oscillate/ramp) driven by
+  a dedicated `DispatcherTimer`, pushing live values straight into the
+  running p5.js sketch via a new JS bridge `setVariable` command
+  (`IP5jsEngineHost.SetGlobalNumber`) — no page reload per animation frame.
+- Named preset snapshots (save/apply/delete) plus JSON export/import via
+  native file dialogs (`SliderPreset`, `SliderPresetSerializer`).
+- 21 new unit tests covering the analyzer, the animator, and preset
+  JSON round-tripping (49 tests solution-wide).
+
+### Fixed
+
+- `SketchViewport` could crash with `ObjectDisposedException` on its
+  `HttpListener` when AvalonDock's layout system triggered a spurious
+  Unload→Load cycle on the WebView2 host; the local HTTP server is now only
+  disposed on an explicit tab close (`IP5jsEngineHost` is now `IDisposable`).
+- The dedicated Sliders/Console side panels were moved from AvalonDock
+  `LayoutAnchorable` panes into the sketch tab's own split view
+  (`SketchTabView`): the anchorable content area was never receiving a
+  layout pass in this environment (confirmed zero `ActualWidth`/`ActualHeight`
+  and no `SizeChanged` regardless of theme, `CanAutoHide`, or tab-selection
+  state), so dynamic content placed there — and even the static Explorer
+  placeholder — never rendered.
+
+### Known Issues
+
+- The Explorer `LayoutAnchorable` (left dock) is still affected by the
+  AvalonDock anchorable content-sizing issue described above. Its content is
+  currently just a placeholder with no functional impact, but the real
+  Explorer implementation (a future phase) will need the same
+  SketchTabView-hosting workaround, or a proper fix/replacement for
+  AvalonDock anchorable content hosting.
+
 ## [0.5.0] - 2026-08-12
 
 ### Added
@@ -176,7 +233,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Repository governance files: `LICENSE` (MIT), `CONTRIBUTING.md`,
   `CODE_OF_CONDUCT.md`, issue and pull request templates.
 
-[Unreleased]: https://github.com/Patrickjaillet/p5ccs/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/Patrickjaillet/p5ccs/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/Patrickjaillet/p5ccs/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/Patrickjaillet/p5ccs/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/Patrickjaillet/p5ccs/compare/v0.3.5...v0.4.0
 [0.3.5]: https://github.com/Patrickjaillet/p5ccs/compare/v0.3.0...v0.3.5

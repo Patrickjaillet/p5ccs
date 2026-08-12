@@ -84,7 +84,7 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private void NewSketch()
     {
-        var tab = new SketchTabViewModel($"Untitled-{_untitledCounter++}.js", null, _preferencesService);
+        var tab = new SketchTabViewModel($"Untitled-{_untitledCounter++}.js", null, _preferencesService, _dialogService);
         OpenSketches.Add(tab);
         SelectedSketch = tab;
     }
@@ -106,7 +106,7 @@ public partial class MainWindowViewModel : ObservableObject
         }
 
         var source = File.Exists(path) ? File.ReadAllText(path) : Sketches.DefaultSketch.Source;
-        var tab = new SketchTabViewModel(Path.GetFileName(path), path, source, _preferencesService);
+        var tab = new SketchTabViewModel(Path.GetFileName(path), path, source, _preferencesService, _dialogService);
         OpenSketches.Add(tab);
         SelectedSketch = tab;
     }
@@ -208,7 +208,7 @@ public partial class MainWindowViewModel : ObservableObject
                 continue;
             }
 
-            var tab = new SketchTabViewModel($"Recovered-{recoveredIndex++}.js", null, source, _preferencesService)
+            var tab = new SketchTabViewModel($"Recovered-{recoveredIndex++}.js", null, source, _preferencesService, _dialogService)
             {
                 IsModified = true,
             };

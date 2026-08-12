@@ -12,6 +12,7 @@ public partial class FullscreenViewportWindow : Window
         InitializeComponent();
         _source = source;
         Loaded += OnLoaded;
+        Closed += (_, _) => Viewport.Dispose();
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)

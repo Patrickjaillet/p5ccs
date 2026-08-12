@@ -5,6 +5,7 @@ using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using P5CCS.App.Sketches;
 using P5CCS.Core.Configuration;
+using P5CCS.Core.Dialogs;
 using P5CCS.Core.Preferences;
 using P5CCS.Editor.ErrorMarkers;
 using P5CCS.Engine;
@@ -17,12 +18,12 @@ public partial class SketchTabViewModel : ObservableObject, IDisposable
     private readonly DispatcherTimer _autoSaveTimer;
     private IP5jsEngineHost? _engine;
 
-    public SketchTabViewModel(string title, string? filePath, IPreferencesService preferencesService)
-        : this(title, filePath, DefaultSketch.Source, preferencesService)
+    public SketchTabViewModel(string title, string? filePath, IPreferencesService preferencesService, IDialogService dialogService)
+        : this(title, filePath, DefaultSketch.Source, preferencesService, dialogService)
     {
     }
 
-    public SketchTabViewModel(string title, string? filePath, string source, IPreferencesService preferencesService)
+    public SketchTabViewModel(string title, string? filePath, string source, IPreferencesService preferencesService, IDialogService dialogService)
     {
         _preferencesService = preferencesService;
         _title = title;
@@ -38,6 +39,8 @@ public partial class SketchTabViewModel : ObservableObject, IDisposable
         {
             _autoSaveTimer.Start();
         }
+
+        SlidersPanel = new SlidersPanelViewModel(this, dialogService);
     }
 
     public Guid Id { get; } = Guid.NewGuid();
@@ -72,7 +75,13 @@ public partial class SketchTabViewModel : ObservableObject, IDisposable
 
     public string RecoveryFilePath => Path.Combine(AppPaths.RecoveryDirectory, $"{Id:N}.js");
 
+    public SlidersPanelViewModel SlidersPanel { get; }
+
     public event EventHandler<IReadOnlyList<EditorErrorMarker>>? ErrorMarkersChanged;
+
+    public event EventHandler? SourceChanged;
+
+    partial void OnSourceChanged(string value) => SourceChanged?.Invoke(this, EventArgs.Empty);
 
     partial void OnTargetFrameRateChanged(int value) => Engine?.SetFrameRate(value);
 
@@ -195,6 +204,8 @@ public partial class SketchTabViewModel : ObservableObject, IDisposable
     public void Dispose()
     {
         _autoSaveTimer.Stop();
+        SlidersPanel.Dispose();
+        Engine?.Dispose();
         DeleteRecoveryFile();
     }
 

@@ -77,6 +77,9 @@
         case 'setFrameRate':
           if (typeof frameRate === 'function') frameRate(data.value);
           break;
+        case 'setVariable':
+          if (typeof data.name === 'string') window[data.name] = data.value;
+          break;
         default:
           break;
       }

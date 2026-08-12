@@ -10,7 +10,7 @@ using P5CCS.Engine.Http;
 
 namespace P5CCS.Engine;
 
-public partial class SketchViewport : UserControl, IP5jsEngineHost
+public partial class SketchViewport : UserControl, IP5jsEngineHost, IDisposable
 {
     private const double MinZoom = 0.25;
     private const double MaxZoom = 4.0;
@@ -20,13 +20,14 @@ public partial class SketchViewport : UserControl, IP5jsEngineHost
     private string _source = string.Empty;
     private bool _isNavigated;
     private bool _isPaused;
+    private bool _isInitialized;
+    private bool _isDisposed;
 
     public SketchViewport()
     {
         InitializeComponent();
         _server = new LocalSketchServer(() => _source);
         Loaded += OnLoaded;
-        Unloaded += OnUnloaded;
     }
 
     public bool IsReady { get; private set; }
@@ -113,6 +114,8 @@ public partial class SketchViewport : UserControl, IP5jsEngineHost
 
     public void SetFrameRate(int framesPerSecond) => PostCommand("setFrameRate", framesPerSecond);
 
+    public void SetGlobalNumber(string name, double value) => PostCommand("setVariable", name, value);
+
     public async Task<byte[]> CaptureScreenshotPngAsync()
     {
         if (WebView.CoreWebView2 is null)
@@ -127,14 +130,27 @@ public partial class SketchViewport : UserControl, IP5jsEngineHost
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
     {
+        if (_isInitialized || _isDisposed)
+        {
+            return;
+        }
+
+        _isInitialized = true;
+
         _server.Start();
         await WebView.EnsureCoreWebView2Async();
         WebView.CoreWebView2.WebMessageReceived += OnWebMessageReceived;
         DrawGrid();
     }
 
-    private void OnUnloaded(object sender, RoutedEventArgs e)
+    public void Dispose()
     {
+        if (_isDisposed)
+        {
+            return;
+        }
+
+        _isDisposed = true;
         _server.Dispose();
     }
 
@@ -144,6 +160,17 @@ public partial class SketchViewport : UserControl, IP5jsEngineHost
         _isNavigated = true;
         _isPaused = false;
         WebView.CoreWebView2.Navigate(_server.BaseUri.ToString());
+    }
+
+    private void PostCommand(string command, string name, double value)
+    {
+        if (WebView.CoreWebView2 is null)
+        {
+            return;
+        }
+
+        var payload = JsonSerializer.Serialize(new { command, name, value });
+        WebView.CoreWebView2.PostWebMessageAsJson(payload);
     }
 
     private void PostCommand(string command, object? value = null)

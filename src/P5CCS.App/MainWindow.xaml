@@ -10,6 +10,7 @@
                  xmlns:views="clr-namespace:P5CCS.App.Views"
                  mc:Ignorable="d"
                  d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel}"
+                 x:Name="RootWindow"
                  Title="Processing 5 - Creative Coding Station"
                  Height="720" Width="1200"
                  ExtendsContentIntoTitleBar="True"
@@ -128,7 +129,7 @@
             </xcad:DockingManager.LayoutItemContainerStyle>
             <xcad:DockingManager.LayoutItemTemplate>
                 <DataTemplate DataType="{x:Type vm:SketchTabViewModel}">
-                    <views:SketchTabView ShowGrid="{Binding DataContext.ShowGrid, RelativeSource={RelativeSource AncestorType=Window}}" />
+                    <views:SketchTabView ShowGrid="{Binding DataContext.ShowGrid, ElementName=RootWindow}" />
                 </DataTemplate>
             </xcad:DockingManager.LayoutItemTemplate>
             <xcad:LayoutRoot>
@@ -142,27 +143,6 @@
                         </xcad:LayoutAnchorable>
                     </xcad:LayoutAnchorablePane>
                     <xcad:LayoutDocumentPane />
-                    <xcad:LayoutAnchorablePane DockWidth="260" DockMinWidth="200">
-                        <xcad:LayoutAnchorable Title="Sliders" CanClose="False" CanAutoHide="True">
-                            <TextBlock Text="Intelligent sliders — coming in a later phase."
-                                       TextWrapping="Wrap"
-                                       Margin="8"
-                                       Opacity="0.6" />
-                        </xcad:LayoutAnchorable>
-                        <xcad:LayoutAnchorable Title="Console" CanClose="False" CanAutoHide="True">
-                            <ListBox ItemsSource="{Binding SelectedSketch.ConsoleLines}"
-                                     FontFamily="Consolas"
-                                     FontSize="12"
-                                     BorderThickness="0"
-                                     ScrollViewer.HorizontalScrollBarVisibility="Auto">
-                                <ListBox.ItemContainerStyle>
-                                    <Style TargetType="ListBoxItem">
-                                        <Setter Property="Padding" Value="4,1" />
-                                    </Style>
-                                </ListBox.ItemContainerStyle>
-                            </ListBox>
-                        </xcad:LayoutAnchorable>
-                    </xcad:LayoutAnchorablePane>
                 </xcad:LayoutPanel>
             </xcad:LayoutRoot>
         </xcad:DockingManager>
