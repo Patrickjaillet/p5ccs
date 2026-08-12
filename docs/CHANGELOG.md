@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-08-12
+
+### Added
+
+- `SketchViewport` (`P5CCS.Engine`): `WebView2`-hosted rendering surface with
+  a fixed native 800x450 canvas, Ctrl+MouseWheel zoom via `ScaleTransform`
+  (render resolution unaffected), and an optional alignment grid overlay.
+- Local, loopback-only HTTP server (`LocalSketchServer`, `HttpListener` bound
+  to `127.0.0.1` on a dynamic port) serving the embedded p5.js runtime
+  (v1.11.3, bundled offline under `resources/p5js`), a JS/C# bridge script,
+  and the active sketch source — zero external network access.
+- `IP5jsEngineHost` contract plus a JS bridge (`bridge.js`) that streams FPS,
+  console/error messages, and mouse position back to C# via
+  `CoreWebView2.PostWebMessageAsJson`, with no C#-side polling: telemetry is
+  pushed once per `p5.redraw()` frame.
+- Per-tab engine lifecycle wired end-to-end: `Run`/`Pause`/`Stop`/`Reset`
+  toolbar and menu commands now drive the real WebView2/p5.js engine of the
+  active sketch tab; the status bar reflects that tab's live FPS, engine
+  status, and canvas-space mouse position.
+- One-click PNG viewport capture (`CoreWebView2.CapturePreviewAsync`) wired
+  to the Export > Quick Export command, writing to a user-chosen path.
+- "Fullscreen Viewport" mode (`FullscreenViewportWindow`): a dedicated,
+  chrome-less, maximized window hosting an independent `SketchViewport`
+  instance for the active sketch, closable with Escape.
+- A default starter sketch (bouncing ball) so every new tab renders
+  something live immediately, ahead of the Phase 5 code editor.
+- Frame rate cap toolbar control (15/24/30/60/120), applied via `frameRate()`
+  through the JS bridge and reapplied automatically on every sketch (re)start.
+- Real integration tests for `LocalSketchServer` (`HttpClient` against the
+  live loopback server, no mocks).
+
 ## [0.3.5] - 2026-08-12
 
 ### Added
@@ -97,7 +128,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Repository governance files: `LICENSE` (MIT), `CONTRIBUTING.md`,
   `CODE_OF_CONDUCT.md`, issue and pull request templates.
 
-[Unreleased]: https://github.com/Patrickjaillet/p5ccs/compare/v0.3.5...HEAD
+[Unreleased]: https://github.com/Patrickjaillet/p5ccs/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/Patrickjaillet/p5ccs/compare/v0.3.5...v0.4.0
 [0.3.5]: https://github.com/Patrickjaillet/p5ccs/compare/v0.3.0...v0.3.5
 [0.3.0]: https://github.com/Patrickjaillet/p5ccs/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/Patrickjaillet/p5ccs/compare/v0.1.0...v0.2.0

@@ -1,11 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <PropertyGroup>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2792.45" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\P5CCS.Core\P5CCS.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\resources\p5js\p5.min.js" LogicalName="P5CCS.Engine.Resources.p5.min.js" Link="Resources\p5js\p5.min.js" />
+    <EmbeddedResource Include="Resources\index.html" LogicalName="P5CCS.Engine.Resources.index.html" />
+    <EmbeddedResource Include="Resources\bridge.js" LogicalName="P5CCS.Engine.Resources.bridge.js" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,13 @@
+<Window x:Class="P5CCS.App.FullscreenViewportWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:engine="clr-namespace:P5CCS.Engine;assembly=P5CCS.Engine"
+        WindowStyle="None"
+        WindowState="Maximized"
+        Background="Black"
+        ShowInTaskbar="False"
+        KeyDown="OnKeyDown">
+    <Grid>
+        <engine:SketchViewport x:Name="Viewport" />
+    </Grid>
+</Window>

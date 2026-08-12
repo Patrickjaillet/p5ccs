@@ -49,6 +49,7 @@ public partial class MainWindowViewModel : ObservableObject
             ["Reset"] = ResetCommand,
             ["QuickExport"] = QuickExportCommand,
             ["ToggleTheme"] = ToggleThemeCommand,
+            ["FullscreenViewport"] = FullscreenViewportCommand,
         };
     }
 
@@ -64,16 +65,7 @@ public partial class MainWindowViewModel : ObservableObject
     private SketchTabViewModel? _selectedSketch;
 
     [ObservableProperty]
-    private bool _isRunning;
-
-    [ObservableProperty]
-    private double _fps;
-
-    [ObservableProperty]
-    private string _engineStatus = "Not Initialized";
-
-    [ObservableProperty]
-    private string _mousePositionText = "-, -";
+    private bool _showGrid;
 
     public ObservableCollection<SketchTabViewModel> OpenSketches { get; }
 
@@ -184,37 +176,36 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void Run()
-    {
-        IsRunning = true;
-        EngineStatus = "Running (engine not yet implemented)";
-    }
+    private void Run() => SelectedSketch?.Run();
 
     [RelayCommand]
-    private void Pause()
-    {
-        EngineStatus = "Paused";
-    }
+    private void Pause() => SelectedSketch?.Pause();
 
     [RelayCommand]
-    private void Stop()
-    {
-        IsRunning = false;
-        EngineStatus = "Stopped";
-    }
+    private void Stop() => SelectedSketch?.Stop();
 
     [RelayCommand]
-    private void Reset()
-    {
-        IsRunning = false;
-        Fps = 0;
-        EngineStatus = "Not Initialized";
-    }
+    private void Reset() => SelectedSketch?.Reset();
 
     [RelayCommand]
-    private void QuickExport()
+    private async Task QuickExport()
     {
-        _dialogService.ShowSaveFileDialog("PNG Image (*.png)|*.png", "Quick Export", "export.png");
+        if (SelectedSketch?.Engine is null)
+        {
+            return;
+        }
+
+        var path = _dialogService.ShowSaveFileDialog("PNG Image (*.png)|*.png", "Quick Export", $"{Path.GetFileNameWithoutExtension(SelectedSketch.Title)}.png");
+        if (path is null)
+        {
+            return;
+        }
+
+        var pngBytes = await SelectedSketch.Engine.CaptureScreenshotPngAsync();
+        if (pngBytes.Length > 0)
+        {
+            await File.WriteAllBytesAsync(path, pngBytes);
+        }
     }
 
     [RelayCommand]
@@ -243,5 +234,20 @@ public partial class MainWindowViewModel : ObservableObject
         var aboutWindow = _aboutWindowFactory();
         aboutWindow.Owner = Application.Current.MainWindow;
         aboutWindow.ShowDialog();
+    }
+
+    [RelayCommand]
+    private void FullscreenViewport()
+    {
+        if (SelectedSketch is null)
+        {
+            return;
+        }
+
+        var window = new FullscreenViewportWindow(SelectedSketch.Source)
+        {
+            Owner = Application.Current.MainWindow,
+        };
+        window.Show();
     }
 }

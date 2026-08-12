@@ -1,6 +1,8 @@
+using System.Windows;
 using System.Windows.Input;
 using P5CCS.App.ViewModels;
 using P5CCS.Core.Input;
+using P5CCS.Engine;
 using Wpf.Ui.Controls;
 
 namespace P5CCS.App;
@@ -16,7 +18,6 @@ public partial class MainWindow : FluentWindow
         DataContext = _viewModel;
 
         ApplyKeyBindings(keyBindingsService);
-        MouseMove += OnMouseMove;
     }
 
     private void ApplyKeyBindings(IKeyBindingsService keyBindingsService)
@@ -39,9 +40,12 @@ public partial class MainWindow : FluentWindow
         }
     }
 
-    private void OnMouseMove(object sender, MouseEventArgs e)
+    private void OnSketchViewportLoaded(object sender, RoutedEventArgs e)
     {
-        var position = e.GetPosition(this);
-        _viewModel.MousePositionText = $"{position.X:0}, {position.Y:0}";
+        var viewport = (SketchViewport)sender;
+        if (viewport.DataContext is SketchTabViewModel tab)
+        {
+            tab.Engine = viewport;
+        }
     }
 }

@@ -17,6 +17,7 @@ public sealed class KeyBindingsService : IKeyBindingsService
         new() { CommandName = "Reset", DisplayName = "Reset Sketch", Gesture = "Ctrl+F5" },
         new() { CommandName = "QuickExport", DisplayName = "Quick Export", Gesture = "Ctrl+E" },
         new() { CommandName = "ToggleTheme", DisplayName = "Toggle Theme", Gesture = "Ctrl+T" },
+        new() { CommandName = "FullscreenViewport", DisplayName = "Fullscreen Viewport", Gesture = "F11" },
     };
 
     private readonly IUserConfigurationService _configurationService;

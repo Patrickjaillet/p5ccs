@@ -7,6 +7,7 @@
                  xmlns:xcad="https://github.com/Dirkster99/AvalonDock"
                  xmlns:xcadThemes="clr-namespace:AvalonDock.Themes.WPFUI;assembly=AvalonDock.Themes.WPFUI"
                  xmlns:vm="clr-namespace:P5CCS.App.ViewModels"
+                 xmlns:engine="clr-namespace:P5CCS.Engine;assembly=P5CCS.Engine"
                  mc:Ignorable="d"
                  d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel}"
                  Title="Processing 5 - Creative Coding Station"
@@ -52,6 +53,9 @@
                 <MenuItem Header="_System Theme" Command="{Binding SetSystemThemeCommand}" />
                 <Separator />
                 <MenuItem Header="Toggle Theme" Command="{Binding ToggleThemeCommand}" InputGestureText="Ctrl+T" />
+                <Separator />
+                <MenuItem Header="Show _Grid" IsCheckable="True" IsChecked="{Binding ShowGrid}" />
+                <MenuItem Header="_Fullscreen Viewport" Command="{Binding FullscreenViewportCommand}" InputGestureText="F11" />
             </MenuItem>
             <MenuItem Header="_Sketch">
                 <MenuItem Header="_Run" Command="{Binding RunCommand}" InputGestureText="F5" />
@@ -84,6 +88,18 @@
                 <ui:SymbolIcon Symbol="ArrowReset24" />
             </Button>
             <Separator />
+            <TextBlock Text="FPS cap:" VerticalAlignment="Center" Margin="4,0" Opacity="0.7" />
+            <ComboBox SelectedValue="{Binding SelectedSketch.TargetFrameRate}"
+                      SelectedValuePath="Content"
+                      Width="70"
+                      ToolTip="Frame rate cap">
+                <ComboBoxItem Content="15" />
+                <ComboBoxItem Content="24" />
+                <ComboBoxItem Content="30" />
+                <ComboBoxItem Content="60" />
+                <ComboBoxItem Content="120" />
+            </ComboBox>
+            <Separator />
             <Button Command="{Binding QuickExportCommand}" ToolTip="Quick Export">
                 <ui:SymbolIcon Symbol="ArrowExportUp24" />
             </Button>
@@ -112,12 +128,8 @@
             </xcad:DockingManager.LayoutItemContainerStyle>
             <xcad:DockingManager.LayoutItemTemplate>
                 <DataTemplate DataType="{x:Type vm:SketchTabViewModel}">
-                    <Grid Background="Transparent">
-                        <TextBlock Text="Sketch editor available from Phase 5 onward."
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center"
-                                   Opacity="0.6" />
-                    </Grid>
+                    <engine:SketchViewport Loaded="OnSketchViewportLoaded"
+                                            ShowGrid="{Binding DataContext.ShowGrid, RelativeSource={RelativeSource AncestorType=Window}}" />
                 </DataTemplate>
             </xcad:DockingManager.LayoutItemTemplate>
             <xcad:LayoutRoot>
@@ -151,14 +163,14 @@
 
         <StatusBar Grid.Row="4">
             <StatusBarItem>
-                <TextBlock Text="{Binding EngineStatus}" />
+                <TextBlock Text="{Binding SelectedSketch.EngineStatus}" />
             </StatusBarItem>
             <Separator />
             <StatusBarItem>
-                <TextBlock Text="{Binding Fps, StringFormat='FPS: {0:0}'}" />
+                <TextBlock Text="{Binding SelectedSketch.Fps, StringFormat='FPS: {0:0}'}" />
             </StatusBarItem>
             <StatusBarItem HorizontalAlignment="Right">
-                <TextBlock Text="{Binding MousePositionText}" />
+                <TextBlock Text="{Binding SelectedSketch.MousePositionText}" />
             </StatusBarItem>
         </StatusBar>
     </Grid>
