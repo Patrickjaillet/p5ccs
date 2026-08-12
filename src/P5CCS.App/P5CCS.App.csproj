@@ -4,6 +4,7 @@
     <OutputType>WinExe</OutputType>
     <UseWPF>true</UseWPF>
     <NoWarn>$(NoWarn);NU1701</NoWarn>
+    <ApplicationIcon>..\..\resources\icons\app.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>

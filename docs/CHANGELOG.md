@@ -7,6 +7,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.5] - 2026-08-13
+
+### Added
+
+- Multi-resolution application icon (`resources/icons/app.ico`, 16–256px,
+  PNG-compressed ICO entries) embedded via `ApplicationIcon` — verified by
+  reloading the file with `System.Drawing.Icon` and by extracting the icon
+  back out of the compiled `P5CCS.App.exe`, not just generated and assumed
+  correct.
+- `installers/windows/setup.iss`: a working Inno Setup 7 script producing
+  a Windows installer for either architecture (`/DAppArch=x64` or
+  `/DAppArch=arm64`), with its own icon/wizard-image/small-image assets.
+  Conditionally bundles a WebView2 Fixed Version Runtime via `#ifexist` if
+  one is present under `resources/webview2runtime/win-<arch>/` at compile
+  time (none is vendored yet — see Known Issues).
+- Real screenshots (`docs/screenshot1.png`, `docs/screenshot2.png`)
+  captured from the actual running application, with the app state
+  verified via UI Automation at the moment of capture rather than assumed.
+
+### Fixed
+
+- `README.md` corrected to match reality: the version badge was still
+  0.1.0, and the feature list claimed a bundled WebView2 "Fixed Version
+  Runtime, fully offline" that isn't actually vendored yet (the app
+  currently falls back to the system's Evergreen runtime — see
+  `WebView2RuntimeLocator`, added in 0.9.0).
+- `docs/COMPILATION.md`'s publish command was missing `-p:Platform=x64`,
+  which the architecture-conditional `ffmpeg.exe` selection added in 0.9.0
+  depends on to pick the right binary.
+
+### Known Issues / Verified
+
+- Both the x64 and ARM64 installer variants were genuinely compiled with
+  Inno Setup 7 (already installed on this machine) against real
+  self-contained `dotnet publish` output for each architecture — not just
+  written and assumed to work. The x64 installer was additionally
+  silent-installed to a temporary directory, the installed app launched
+  and confirmed working (editor, 7 sliders, live sketch execution via UI
+  Automation), and then silently uninstalled with a confirmed clean
+  removal of the install directory.
+- Repository compliance verified for this phase: no mentions of Claude AI
+  anywhere in the tracked repository, git history, or git identity; both
+  `ROADMAP.md` and `CLAUDE.md` confirmed excluded via `.gitignore` and
+  absent from `git ls-files`.
+- No WebView2 Fixed Version Runtime is bundled yet (only the code-level
+  detection support added in 0.9.0); see `docs/KNOWN-LIMITATIONS.md`.
+
 ## [0.9.0] - 2026-08-13
 
 ### Added

@@ -40,3 +40,4 @@ logs/
 
 ## Installer output
 installers/windows/Output/
+dist/

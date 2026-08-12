@@ -6,7 +6,10 @@
 - [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) (LTS)
 - Visual Studio 2022 (17.8+) with the ".NET desktop development" workload, or
   the `dotnet` CLI alone
-- Git
+- Git, with [Git LFS](https://git-lfs.com/) installed and run once via
+  `git lfs install` — the embedded `ffmpeg.exe` binaries are tracked via LFS
+- [Inno Setup 7](https://jrsoftware.org/isinfo.php) (only needed to build the
+  Windows installer, not for `dotnet build`/`test`/`publish`)
 
 The exact SDK version is pinned in [`global.json`](../global.json).
 
@@ -40,17 +43,39 @@ dotnet test P5CCS.sln --configuration Release
 ## Publishing (Self-Contained)
 
 ```powershell
-dotnet publish src/P5CCS.App/P5CCS.App.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=false
+dotnet publish src/P5CCS.App/P5CCS.App.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=false -p:Platform=x64
 ```
 
-Replace `win-x64` with `win-arm64` for the ARM64 build.
+For ARM64 (produces a genuinely native ARM64 build — including the bundled
+`ffmpeg.exe`, not an x64 binary running under emulation):
+
+```powershell
+dotnet publish src/P5CCS.App/P5CCS.App.csproj -c Release -r win-arm64 --self-contained true -p:PublishSingleFile=false -p:Platform=ARM64
+```
+
+Output lands in
+`src/P5CCS.App/bin/<Platform>/Release/net8.0-windows/<RID>/publish/`.
 
 ## Building the Windows Installer
 
-The Inno Setup 7 script for the Windows installer is located at
-`installers/windows/setup.iss` (added in a later development phase). It
-packages the self-contained publish output together with the embedded
-WebView2 Fixed Version Runtime.
+The Inno Setup 7 script is at `installers/windows/setup.iss`. Publish first
+(see above), then compile with `ISCC.exe`, passing the architecture:
+
+```powershell
+& "C:\Program Files\Inno Setup 7\ISCC.exe" /DAppArch=x64 installers\windows\setup.iss
+```
+
+```powershell
+& "C:\Program Files\Inno Setup 7\ISCC.exe" /DAppArch=arm64 installers\windows\setup.iss
+```
+
+Both produce `dist\P5CCS-Setup-<version>-<arch>.exe`. The installer bundles
+a WebView2 Fixed Version Runtime automatically if one is present at
+`resources/webview2runtime/win-<arch>/` at compile time (see
+[`docs/KNOWN-LIMITATIONS.md`](KNOWN-LIMITATIONS.md) — none is vendored yet,
+so installs currently fall back to the system's Evergreen WebView2 Runtime,
+which `WebView2RuntimeLocator` detects and prefers automatically once a
+Fixed Version Runtime folder is added).
 
 ## Notes
 
