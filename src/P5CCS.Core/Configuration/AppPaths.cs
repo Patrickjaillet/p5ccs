@@ -10,6 +10,8 @@ public static class AppPaths
 
     public static string LogsDirectory => Path.Combine(RootDirectory, "logs");
 
+    public static string RecoveryDirectory => Path.Combine(RootDirectory, "recovery");
+
     public static string PreferencesFilePath => Path.Combine(RootDirectory, "preferences.json");
 
     public static string ConfigurationFilePath => Path.Combine(RootDirectory, "config.json");
@@ -18,5 +20,6 @@ public static class AppPaths
     {
         Directory.CreateDirectory(RootDirectory);
         Directory.CreateDirectory(LogsDirectory);
+        Directory.CreateDirectory(RecoveryDirectory);
     }
 }

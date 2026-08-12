@@ -7,6 +7,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-08-12
+
+### Added
+
+- `SketchCodeEditor` (`P5CCS.Editor`): full AvalonEdit-based code editor —
+  native line numbers, real code folding (`JsBraceFoldingStrategy`, brace/
+  bracket-aware), auto-indentation and bracket handling
+  (`CSharpIndentationStrategy`), unlimited per-session undo/redo, and
+  rectangular/box selection (all native to AvalonEdit).
+- Custom JavaScript/p5.js syntax highlighting (`P5JavaScriptDark.xshd` /
+  `P5JavaScriptLight.xshd`): keywords, p5.js API functions, constants,
+  numbers, strings, and generic call expressions, switched automatically
+  with the application theme.
+- Contextual p5.js API autocompletion (`CompletionWindow`, curated
+  `P5ApiCatalog` of ~80 core functions/constants with signature and
+  description) and hover documentation tooltips
+  (`TextView.MouseHover`).
+- Real-time error indication: squiggly underlines
+  (`SquigglyUnderlineRenderer`, a custom `IBackgroundRenderer`) and a
+  clickable error margin (`ErrorMargin`) that jumps the caret to the
+  offending line — fed by actual runtime errors reported from the WebView2
+  engine via the JS bridge (`window.onerror`, `sketch.js:<line>` parsing),
+  not a fake/simulated linter.
+- Find/replace with regex, case, and whole-word options via AvalonEdit's
+  built-in `SearchPanel`.
+- Editor font zoom (Ctrl+MouseWheel) and light/dark editor color theme,
+  linked live to the application's Fluent theme
+  (`ApplicationThemeManager.Changed`).
+- Auto-save (configurable interval/enabled in preferences) with crash
+  recovery: unsaved sketch content is periodically written to
+  `%AppData%\P5CCS\recovery`, and orphaned recovery files from an
+  unclean shutdown are automatically reopened as tabs on next startup.
+- Debounced hot-reload: edits automatically reload the sketch in the
+  Viewport shortly after typing stops (configurable), without needing to
+  press Run.
+- Runtime console panel wired to real `console.log`/`console.error`/
+  uncaught-exception messages streamed from the engine, per sketch tab.
+- Split editor + Viewport layout (`SketchTabView`, `GridSplitter`) replacing
+  the Viewport-only tab content from Phase 4.
+- New `P5CCS.Editor.Tests` project with real logic tests for the folding
+  strategy and the p5.js API catalog (32 tests solution-wide).
+
+### Fixed
+
+- The p5.js API completion window now properly commits or dismisses on
+  non-identifier characters (missing `TextArea.TextEntering` handler),
+  preventing it from getting stuck open and swallowing further input.
+
 ## [0.4.0] - 2026-08-12
 
 ### Added
@@ -128,7 +176,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Repository governance files: `LICENSE` (MIT), `CONTRIBUTING.md`,
   `CODE_OF_CONDUCT.md`, issue and pull request templates.
 
-[Unreleased]: https://github.com/Patrickjaillet/p5ccs/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/Patrickjaillet/p5ccs/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/Patrickjaillet/p5ccs/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/Patrickjaillet/p5ccs/compare/v0.3.5...v0.4.0
 [0.3.5]: https://github.com/Patrickjaillet/p5ccs/compare/v0.3.0...v0.3.5
 [0.3.0]: https://github.com/Patrickjaillet/p5ccs/compare/v0.2.0...v0.3.0

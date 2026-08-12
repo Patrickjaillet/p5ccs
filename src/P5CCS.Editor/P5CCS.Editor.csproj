@@ -12,4 +12,9 @@
     <ProjectReference Include="..\P5CCS.Core\P5CCS.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Highlighting\P5JavaScriptDark.xshd" LogicalName="P5CCS.Editor.Highlighting.P5JavaScriptDark.xshd" />
+    <EmbeddedResource Include="Highlighting\P5JavaScriptLight.xshd" LogicalName="P5CCS.Editor.Highlighting.P5JavaScriptLight.xshd" />
+  </ItemGroup>
+
 </Project>

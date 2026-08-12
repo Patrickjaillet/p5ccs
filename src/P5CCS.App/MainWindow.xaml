@@ -7,7 +7,7 @@
                  xmlns:xcad="https://github.com/Dirkster99/AvalonDock"
                  xmlns:xcadThemes="clr-namespace:AvalonDock.Themes.WPFUI;assembly=AvalonDock.Themes.WPFUI"
                  xmlns:vm="clr-namespace:P5CCS.App.ViewModels"
-                 xmlns:engine="clr-namespace:P5CCS.Engine;assembly=P5CCS.Engine"
+                 xmlns:views="clr-namespace:P5CCS.App.Views"
                  mc:Ignorable="d"
                  d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel}"
                  Title="Processing 5 - Creative Coding Station"
@@ -128,8 +128,7 @@
             </xcad:DockingManager.LayoutItemContainerStyle>
             <xcad:DockingManager.LayoutItemTemplate>
                 <DataTemplate DataType="{x:Type vm:SketchTabViewModel}">
-                    <engine:SketchViewport Loaded="OnSketchViewportLoaded"
-                                            ShowGrid="{Binding DataContext.ShowGrid, RelativeSource={RelativeSource AncestorType=Window}}" />
+                    <views:SketchTabView ShowGrid="{Binding DataContext.ShowGrid, RelativeSource={RelativeSource AncestorType=Window}}" />
                 </DataTemplate>
             </xcad:DockingManager.LayoutItemTemplate>
             <xcad:LayoutRoot>
@@ -151,10 +150,17 @@
                                        Opacity="0.6" />
                         </xcad:LayoutAnchorable>
                         <xcad:LayoutAnchorable Title="Console" CanClose="False" CanAutoHide="True">
-                            <TextBlock Text="Runtime console — coming in a later phase."
-                                       TextWrapping="Wrap"
-                                       Margin="8"
-                                       Opacity="0.6" />
+                            <ListBox ItemsSource="{Binding SelectedSketch.ConsoleLines}"
+                                     FontFamily="Consolas"
+                                     FontSize="12"
+                                     BorderThickness="0"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                                <ListBox.ItemContainerStyle>
+                                    <Style TargetType="ListBoxItem">
+                                        <Setter Property="Padding" Value="4,1" />
+                                    </Style>
+                                </ListBox.ItemContainerStyle>
+                            </ListBox>
                         </xcad:LayoutAnchorable>
                     </xcad:LayoutAnchorablePane>
                 </xcad:LayoutPanel>

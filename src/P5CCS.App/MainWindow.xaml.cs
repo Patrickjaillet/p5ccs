@@ -1,8 +1,6 @@
-using System.Windows;
 using System.Windows.Input;
 using P5CCS.App.ViewModels;
 using P5CCS.Core.Input;
-using P5CCS.Engine;
 using Wpf.Ui.Controls;
 
 namespace P5CCS.App;
@@ -37,15 +35,6 @@ public partial class MainWindow : FluentWindow
             }
 
             InputBindings.Add(new KeyBinding(command, gesture));
-        }
-    }
-
-    private void OnSketchViewportLoaded(object sender, RoutedEventArgs e)
-    {
-        var viewport = (SketchViewport)sender;
-        if (viewport.DataContext is SketchTabViewModel tab)
-        {
-            tab.Engine = viewport;
         }
     }
 }

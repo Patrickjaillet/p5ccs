@@ -11,4 +11,10 @@ public sealed class UserPreferences
     public string? PanelLayout { get; set; }
 
     public string AccentColorHex { get; set; } = "#0078D4";
+
+    public bool AutoSaveEnabled { get; set; } = true;
+
+    public int AutoSaveIntervalSeconds { get; set; } = 30;
+
+    public bool LiveReloadEnabled { get; set; } = true;
 }

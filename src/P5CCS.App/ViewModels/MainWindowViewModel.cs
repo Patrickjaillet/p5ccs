@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using P5CCS.Core.Configuration;
 using P5CCS.Core.Dialogs;
 using P5CCS.Core.Preferences;
 using P5CCS.Core.Theming;
@@ -36,7 +37,11 @@ public partial class MainWindowViewModel : ObservableObject
         CurrentTheme = _preferencesService.Current.Theme;
 
         OpenSketches = new ObservableCollection<SketchTabViewModel>();
-        NewSketch();
+        RecoverOrphanedSketches();
+        if (OpenSketches.Count == 0)
+        {
+            NewSketch();
+        }
 
         CommandsByName = new Dictionary<string, ICommand>
         {
@@ -79,7 +84,7 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private void NewSketch()
     {
-        var tab = new SketchTabViewModel($"Untitled-{_untitledCounter++}.js", null);
+        var tab = new SketchTabViewModel($"Untitled-{_untitledCounter++}.js", null, _preferencesService);
         OpenSketches.Add(tab);
         SelectedSketch = tab;
     }
@@ -100,7 +105,8 @@ public partial class MainWindowViewModel : ObservableObject
             return;
         }
 
-        var tab = new SketchTabViewModel(Path.GetFileName(path), path);
+        var source = File.Exists(path) ? File.ReadAllText(path) : Sketches.DefaultSketch.Source;
+        var tab = new SketchTabViewModel(Path.GetFileName(path), path, source, _preferencesService);
         OpenSketches.Add(tab);
         SelectedSketch = tab;
     }
@@ -119,6 +125,7 @@ public partial class MainWindowViewModel : ObservableObject
             return;
         }
 
+        File.WriteAllText(SelectedSketch.FilePath, SelectedSketch.Source);
         SelectedSketch.IsModified = false;
     }
 
@@ -136,6 +143,7 @@ public partial class MainWindowViewModel : ObservableObject
             return;
         }
 
+        File.WriteAllText(path, SelectedSketch.Source);
         SelectedSketch.FilePath = path;
         SelectedSketch.Title = Path.GetFileName(path);
         SelectedSketch.IsModified = false;
@@ -152,6 +160,7 @@ public partial class MainWindowViewModel : ObservableObject
 
         var index = OpenSketches.IndexOf(tab);
         OpenSketches.Remove(tab);
+        tab.Dispose();
 
         if (OpenSketches.Count == 0)
         {
@@ -165,8 +174,53 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private void CloseAllTabs()
     {
+        foreach (var tab in OpenSketches)
+        {
+            tab.Dispose();
+        }
+
         OpenSketches.Clear();
         NewSketch();
+    }
+
+    private void RecoverOrphanedSketches()
+    {
+        AppPaths.EnsureDirectoriesExist();
+
+        var recoveryFiles = Directory.GetFiles(AppPaths.RecoveryDirectory, "*.js");
+        var recoveredIndex = 1;
+
+        foreach (var recoveryFile in recoveryFiles)
+        {
+            string source;
+            try
+            {
+                source = File.ReadAllText(recoveryFile);
+            }
+            catch (IOException)
+            {
+                continue;
+            }
+
+            if (string.IsNullOrWhiteSpace(source))
+            {
+                File.Delete(recoveryFile);
+                continue;
+            }
+
+            var tab = new SketchTabViewModel($"Recovered-{recoveredIndex++}.js", null, source, _preferencesService)
+            {
+                IsModified = true,
+            };
+            OpenSketches.Add(tab);
+
+            File.Delete(recoveryFile);
+        }
+
+        if (OpenSketches.Count > 0)
+        {
+            SelectedSketch = OpenSketches[0];
+        }
     }
 
     [RelayCommand]

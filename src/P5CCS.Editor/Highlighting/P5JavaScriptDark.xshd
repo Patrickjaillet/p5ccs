@@ -1,0 +1,285 @@
+<?xml version="1.0"?>
+<SyntaxDefinition name="P5JavaScript" xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  <Color name="Comment" foreground="#6A9955" />
+  <Color name="String" foreground="#CE9178" />
+  <Color name="Keyword" foreground="#569CD6" fontWeight="bold" />
+  <Color name="P5Function" foreground="#4EC9B0" fontWeight="bold" />
+  <Color name="P5Constant" foreground="#9CDCFE" />
+  <Color name="Number" foreground="#B5CEA8" />
+  <Color name="MethodCall" foreground="#DCDCAA" />
+  <Color name="Punctuation" foreground="#D4D4D4" />
+
+  <RuleSet>
+    <Span color="Comment" begin="//" />
+    <Span color="Comment" multiline="true">
+      <Begin>/\*</Begin>
+      <End>\*/</End>
+    </Span>
+
+    <Span color="String">
+      <Begin>"</Begin>
+      <End>"</End>
+      <RuleSet>
+        <Span begin="\\" end="." />
+      </RuleSet>
+    </Span>
+    <Span color="String">
+      <Begin>'</Begin>
+      <End>'</End>
+      <RuleSet>
+        <Span begin="\\" end="." />
+      </RuleSet>
+    </Span>
+    <Span color="String">
+      <Begin>`</Begin>
+      <End>`</End>
+      <RuleSet>
+        <Span begin="\\" end="." />
+      </RuleSet>
+    </Span>
+
+    <Keywords color="Keyword">
+      <Word>var</Word>
+      <Word>let</Word>
+      <Word>const</Word>
+      <Word>function</Word>
+      <Word>if</Word>
+      <Word>else</Word>
+      <Word>for</Word>
+      <Word>while</Word>
+      <Word>do</Word>
+      <Word>return</Word>
+      <Word>new</Word>
+      <Word>this</Word>
+      <Word>class</Word>
+      <Word>extends</Word>
+      <Word>super</Word>
+      <Word>typeof</Word>
+      <Word>instanceof</Word>
+      <Word>break</Word>
+      <Word>continue</Word>
+      <Word>switch</Word>
+      <Word>case</Word>
+      <Word>default</Word>
+      <Word>try</Word>
+      <Word>catch</Word>
+      <Word>finally</Word>
+      <Word>throw</Word>
+      <Word>true</Word>
+      <Word>false</Word>
+      <Word>null</Word>
+      <Word>undefined</Word>
+      <Word>in</Word>
+      <Word>of</Word>
+      <Word>async</Word>
+      <Word>await</Word>
+      <Word>static</Word>
+      <Word>get</Word>
+      <Word>set</Word>
+      <Word>yield</Word>
+      <Word>delete</Word>
+      <Word>void</Word>
+    </Keywords>
+
+    <Keywords color="P5Function">
+      <Word>setup</Word>
+      <Word>draw</Word>
+      <Word>preload</Word>
+      <Word>remove</Word>
+      <Word>noLoop</Word>
+      <Word>loop</Word>
+      <Word>isLooping</Word>
+      <Word>push</Word>
+      <Word>pop</Word>
+      <Word>redraw</Word>
+      <Word>createCanvas</Word>
+      <Word>resizeCanvas</Word>
+      <Word>background</Word>
+      <Word>clear</Word>
+      <Word>colorMode</Word>
+      <Word>fill</Word>
+      <Word>noFill</Word>
+      <Word>stroke</Word>
+      <Word>noStroke</Word>
+      <Word>strokeWeight</Word>
+      <Word>strokeCap</Word>
+      <Word>strokeJoin</Word>
+      <Word>rect</Word>
+      <Word>ellipse</Word>
+      <Word>circle</Word>
+      <Word>square</Word>
+      <Word>line</Word>
+      <Word>point</Word>
+      <Word>triangle</Word>
+      <Word>quad</Word>
+      <Word>arc</Word>
+      <Word>bezier</Word>
+      <Word>curve</Word>
+      <Word>beginShape</Word>
+      <Word>endShape</Word>
+      <Word>vertex</Word>
+      <Word>curveVertex</Word>
+      <Word>bezierVertex</Word>
+      <Word>translate</Word>
+      <Word>rotate</Word>
+      <Word>scale</Word>
+      <Word>shearX</Word>
+      <Word>shearY</Word>
+      <Word>applyMatrix</Word>
+      <Word>resetMatrix</Word>
+      <Word>text</Word>
+      <Word>textFont</Word>
+      <Word>textSize</Word>
+      <Word>textAlign</Word>
+      <Word>textLeading</Word>
+      <Word>textStyle</Word>
+      <Word>textWidth</Word>
+      <Word>loadFont</Word>
+      <Word>random</Word>
+      <Word>randomSeed</Word>
+      <Word>noise</Word>
+      <Word>noiseSeed</Word>
+      <Word>noiseDetail</Word>
+      <Word>map</Word>
+      <Word>constrain</Word>
+      <Word>dist</Word>
+      <Word>lerp</Word>
+      <Word>norm</Word>
+      <Word>mag</Word>
+      <Word>radians</Word>
+      <Word>degrees</Word>
+      <Word>min</Word>
+      <Word>max</Word>
+      <Word>abs</Word>
+      <Word>floor</Word>
+      <Word>ceil</Word>
+      <Word>round</Word>
+      <Word>sqrt</Word>
+      <Word>pow</Word>
+      <Word>sq</Word>
+      <Word>exp</Word>
+      <Word>log</Word>
+      <Word>sin</Word>
+      <Word>cos</Word>
+      <Word>tan</Word>
+      <Word>asin</Word>
+      <Word>acos</Word>
+      <Word>atan</Word>
+      <Word>atan2</Word>
+      <Word>createVector</Word>
+      <Word>color</Word>
+      <Word>red</Word>
+      <Word>green</Word>
+      <Word>blue</Word>
+      <Word>alpha</Word>
+      <Word>hue</Word>
+      <Word>saturation</Word>
+      <Word>brightness</Word>
+      <Word>lerpColor</Word>
+      <Word>mouseMoved</Word>
+      <Word>mousePressed</Word>
+      <Word>mouseReleased</Word>
+      <Word>mouseDragged</Word>
+      <Word>mouseClicked</Word>
+      <Word>mouseWheel</Word>
+      <Word>keyPressed</Word>
+      <Word>keyReleased</Word>
+      <Word>keyTyped</Word>
+      <Word>keyIsDown</Word>
+      <Word>touchStarted</Word>
+      <Word>touchMoved</Word>
+      <Word>touchEnded</Word>
+      <Word>frameRate</Word>
+      <Word>loadImage</Word>
+      <Word>image</Word>
+      <Word>imageMode</Word>
+      <Word>tint</Word>
+      <Word>noTint</Word>
+      <Word>loadJSON</Word>
+      <Word>loadStrings</Word>
+      <Word>loadTable</Word>
+      <Word>saveCanvas</Word>
+      <Word>save</Word>
+      <Word>createGraphics</Word>
+      <Word>createShader</Word>
+      <Word>shader</Word>
+      <Word>ambientLight</Word>
+      <Word>directionalLight</Word>
+      <Word>pointLight</Word>
+      <Word>normalMaterial</Word>
+      <Word>ambientMaterial</Word>
+      <Word>specularMaterial</Word>
+      <Word>box</Word>
+      <Word>sphere</Word>
+      <Word>plane</Word>
+      <Word>cylinder</Word>
+      <Word>cone</Word>
+      <Word>torus</Word>
+      <Word>camera</Word>
+      <Word>perspective</Word>
+      <Word>ortho</Word>
+      <Word>orbitControl</Word>
+    </Keywords>
+
+    <Keywords color="P5Constant">
+      <Word>PI</Word>
+      <Word>TWO_PI</Word>
+      <Word>HALF_PI</Word>
+      <Word>QUARTER_PI</Word>
+      <Word>TAU</Word>
+      <Word>width</Word>
+      <Word>height</Word>
+      <Word>mouseX</Word>
+      <Word>mouseY</Word>
+      <Word>pmouseX</Word>
+      <Word>pmouseY</Word>
+      <Word>mouseButton</Word>
+      <Word>key</Word>
+      <Word>keyCode</Word>
+      <Word>frameCount</Word>
+      <Word>deltaTime</Word>
+      <Word>windowWidth</Word>
+      <Word>windowHeight</Word>
+      <Word>displayWidth</Word>
+      <Word>displayHeight</Word>
+      <Word>CENTER</Word>
+      <Word>CORNER</Word>
+      <Word>CORNERS</Word>
+      <Word>RADIUS</Word>
+      <Word>RGB</Word>
+      <Word>HSB</Word>
+      <Word>HSL</Word>
+      <Word>LEFT</Word>
+      <Word>RIGHT</Word>
+      <Word>TOP</Word>
+      <Word>BOTTOM</Word>
+      <Word>BASELINE</Word>
+      <Word>DEGREES</Word>
+      <Word>RADIANS</Word>
+      <Word>WEBGL</Word>
+      <Word>P2D</Word>
+      <Word>CLOSE</Word>
+      <Word>PIE</Word>
+      <Word>CHORD</Word>
+      <Word>OPEN</Word>
+      <Word>ROUND</Word>
+      <Word>SQUARE</Word>
+      <Word>PROJECT</Word>
+      <Word>MITER</Word>
+      <Word>BEVEL</Word>
+    </Keywords>
+
+    <Rule color="Number">
+      \b0[xX][0-9a-fA-F]+
+      |
+      ( \b\d+(\.[0-9]+)?
+      | \.[0-9]+
+      )
+      ([eE][+-]?[0-9]+)?
+    </Rule>
+
+    <Rule color="MethodCall">
+      \b[_a-zA-Z][_a-zA-Z0-9]*(?=\s*\()
+    </Rule>
+  </RuleSet>
+</SyntaxDefinition>
