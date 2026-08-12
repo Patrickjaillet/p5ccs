@@ -7,6 +7,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-08-12
+
+### Added
+
+- `p5.sound.min.js` (v1.0.1, matching the vendored p5.js v1.11.3) embedded
+  as a .NET resource and served locally alongside `p5.min.js` — Oscillator,
+  SoundFile, Amplitude, FFT, Envelope, Noise, Delay, Reverb, and Filter all
+  confirmed working at runtime.
+- Local asset loading: `LocalSketchServer` now serves static files (images,
+  fonts, JSON, CSV, audio, GLSL, etc.) from the sketch's own directory via
+  a new `AssetDirectory` property, with path-traversal protection
+  (`ResolveAssetPath`) and MIME-type mapping. `SketchTabViewModel.FilePath`
+  now propagates the sketch's folder to `IP5jsEngineHost.SetAssetDirectory`
+  whenever a sketch is opened, saved-as, or its engine is (re)attached.
+- New "API Reference" tab (`ApiReferencePanel` / `ApiReferenceViewModel`) in
+  every sketch's side panel: a searchable, category-grouped, fully offline
+  browser for the p5.js API. `P5ApiCatalog` (`P5CCS.Editor`) expanded from
+  73 to ~120 entries and gained a `Category` field, adding full coverage of
+  Sound, WEBGL/3D, Vector & Data (Vector/Table/TypedDict), and DOM, on top
+  of the existing 2D Core/Math/Typography/Events/Constants entries.
+- `docs/validation-sketches/`: a committed manual validation suite, one
+  sketch per p5.js module (2D core, Sound, WEBGL, Vector/Table/TypedDict,
+  custom GLSL shaders, DOM, local asset loading), each printing
+  `VALIDATION:<module>:true` to the console when the module works
+  correctly — see its `README.md` for how to run them.
+- 6 new xUnit tests for the local asset server (nested paths, MIME
+  mapping, missing-directory 404, and path-traversal rejection via a
+  directly-testable `LocalSketchServer.ResolveAssetPath`), 3 new tests
+  for the expanded API catalog (70 tests solution-wide).
+
+### Fixed
+
+- Confirmed WEBGL/3D rendering (lights, geometry), custom GLSL shaders
+  (`createShader`), `p5.Vector`/`p5.Table`/`p5.TypedDict`, and `p5.dom`
+  (bundled in core `p5.min.js` for this version, no separate addon needed)
+  all work correctly in the embedded WebView2 runtime — validated with
+  real running sketches, not just code review.
+
+### Known Issues
+
+- Video/camera texture support (`createCapture` + WEBGL texture) was not
+  validated in this phase — camera/microphone access is unavailable in
+  the sandboxed test environment used for this session.
+- The automated validation suite is currently a manually-run set of
+  fixture sketches (`docs/validation-sketches/`), not a headless/CI-
+  integrated test harness; building a full WebView2-based automated E2E
+  suite remains a future task.
+- End-to-end verification of local asset loading through the app's
+  native "Save As" file dialog could not be completed via UI automation
+  in this session's environment (the dialog reliably failed to appear
+  under synthetic input); the underlying server-side logic is covered by
+  6 real HTTP-level tests instead.
+
 ## [0.6.3] - 2026-08-12
 
 ### Fixed

@@ -16,6 +16,8 @@ public interface IP5jsEngineHost : IDisposable
 
     void LoadSketch(string source);
 
+    void SetAssetDirectory(string? directoryPath);
+
     void Run();
 
     void Pause();

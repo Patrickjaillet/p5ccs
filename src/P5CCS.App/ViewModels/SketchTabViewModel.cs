@@ -71,7 +71,17 @@ public partial class SketchTabViewModel : ObservableObject, IDisposable
 
     public ObservableCollection<string> ConsoleLines { get; } = new();
 
-    public string? FilePath { get; set; }
+    private string? _filePath;
+
+    public string? FilePath
+    {
+        get => _filePath;
+        set
+        {
+            _filePath = value;
+            Engine?.SetAssetDirectory(value is null ? null : Path.GetDirectoryName(value));
+        }
+    }
 
     public string RecoveryFilePath => Path.Combine(AppPaths.RecoveryDirectory, $"{Id:N}.js");
 
@@ -111,6 +121,7 @@ public partial class SketchTabViewModel : ObservableObject, IDisposable
                 _engine.FpsChanged += OnFpsChanged;
                 _engine.SketchMouseMoved += OnMouseMoved;
                 _engine.ConsoleMessageReceived += OnConsoleMessage;
+                _engine.SetAssetDirectory(FilePath is null ? null : Path.GetDirectoryName(FilePath));
                 _engine.LoadSketch(Source);
                 _engine.Run();
                 EngineStatus = "Starting";

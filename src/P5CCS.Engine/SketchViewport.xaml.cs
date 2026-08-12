@@ -58,6 +58,8 @@ public partial class SketchViewport : UserControl, IP5jsEngineHost, IDisposable
         }
     }
 
+    public void SetAssetDirectory(string? directoryPath) => _server.AssetDirectory = directoryPath;
+
     public void Run()
     {
         if (!_isNavigated)

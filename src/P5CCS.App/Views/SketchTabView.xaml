@@ -54,6 +54,9 @@
                     </ListBox.ItemContainerStyle>
                 </ListBox>
             </TabItem>
+            <TabItem Header="API Reference">
+                <views:ApiReferencePanel />
+            </TabItem>
         </TabControl>
     </Grid>
 </UserControl>

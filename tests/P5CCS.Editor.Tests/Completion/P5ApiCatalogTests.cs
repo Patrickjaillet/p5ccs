@@ -39,4 +39,27 @@ public class P5ApiCatalogTests
     {
         Assert.Contains(P5ApiCatalog.Entries, e => e.Name == expectedName);
     }
+
+    [Theory]
+    [InlineData("loadSound", "Sound")]
+    [InlineData("p5.Oscillator", "Sound")]
+    [InlineData("createShader", "WEBGL / 3D")]
+    [InlineData("sphere", "WEBGL / 3D")]
+    [InlineData("loadModel", "WEBGL / 3D")]
+    [InlineData("loadJSON", "Vector & Data")]
+    [InlineData("p5.Table", "Vector & Data")]
+    [InlineData("createNumberDict", "Vector & Data")]
+    [InlineData("loadImage", "Image")]
+    [InlineData("createDiv", "DOM")]
+    public void Entries_ContainExpandedApiModulesWithCorrectCategory(string expectedName, string expectedCategory)
+    {
+        var entry = Assert.Single(P5ApiCatalog.Entries, e => e.Name == expectedName);
+        Assert.Equal(expectedCategory, entry.Category);
+    }
+
+    [Fact]
+    public void Entries_AllHaveNonEmptyCategory()
+    {
+        Assert.All(P5ApiCatalog.Entries, entry => Assert.False(string.IsNullOrWhiteSpace(entry.Category)));
+    }
 }
