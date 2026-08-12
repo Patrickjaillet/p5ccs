@@ -46,6 +46,9 @@ public partial class App : Application
 
         services.AddTransient<MainWindowViewModel>();
         services.AddTransient<MainWindow>();
+        services.AddTransient<AboutViewModel>();
+        services.AddTransient<AboutWindow>();
+        services.AddTransient<Func<AboutWindow>>(sp => () => sp.GetRequiredService<AboutWindow>());
 
         _serviceProvider = services.BuildServiceProvider();
 
@@ -64,6 +67,8 @@ public partial class App : Application
         themeService.ApplyTheme(preferencesService.Current.Theme);
 
         var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
+        MainWindow = mainWindow;
+        ShutdownMode = ShutdownMode.OnMainWindowClose;
 
         var remainingDelay = MinimumSplashDurationMilliseconds - (int)splashStopwatch.ElapsedMilliseconds;
         if (remainingDelay > 0)

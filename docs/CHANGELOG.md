@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.5] - 2026-08-12
+
+### Added
+
+- "About" window (`ui:FluentWindow`, modal, accessible from Help > About):
+  product name, current SemVer version, copyright notice, `mailto:` contact
+  link, clickable website link, MIT license mention with full embedded
+  license text, and a complete third-party notices tab covering p5.js,
+  WPF-UI, AvalonEdit, AvalonDock, AvalonDock.Themes.WPFUI, WebView2 SDK,
+  FFmpegCore/FFmpeg, SixLabors.ImageSharp, CommunityToolkit.Mvvm, Serilog,
+  and Microsoft.Extensions.*.
+- `docs/THIRD-PARTY-NOTICES.md`, embedded into the application binary and
+  bundled with `LICENSE` as read-only resources for offline display.
+
+### Fixed
+
+- `Application.MainWindow` is now explicitly assigned to the real main
+  window instead of relying on WPF's implicit "first shown window" behavior,
+  which was incorrectly capturing the startup splash screen and crashing
+  the app when opening a second window (`Cannot set Owner property to
+  itself`).
+- `Hyperlink.NavigateUri` bindings now use `Uri`-typed static members
+  instead of raw strings via `x:Static`, which bypassed `Uri`'s
+  `TypeConverter` and crashed the app with an `XamlParseException`.
+- Assembly informational version no longer has a `+<git-sha>` suffix
+  auto-appended by the .NET SDK, keeping it strict SemVer as required by
+  project conventions (`IncludeSourceRevisionInInformationalVersion=false`).
+
 ## [0.3.0] - 2026-08-12
 
 ### Added
@@ -69,7 +97,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Repository governance files: `LICENSE` (MIT), `CONTRIBUTING.md`,
   `CODE_OF_CONDUCT.md`, issue and pull request templates.
 
-[Unreleased]: https://github.com/Patrickjaillet/p5ccs/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/Patrickjaillet/p5ccs/compare/v0.3.5...HEAD
+[0.3.5]: https://github.com/Patrickjaillet/p5ccs/compare/v0.3.0...v0.3.5
 [0.3.0]: https://github.com/Patrickjaillet/p5ccs/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/Patrickjaillet/p5ccs/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/Patrickjaillet/p5ccs/releases/tag/v0.1.0

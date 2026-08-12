@@ -12,12 +12,13 @@
   </PropertyGroup>
 
   <PropertyGroup Label="SemVer">
-    <VersionPrefix>0.3.0</VersionPrefix>
+    <VersionPrefix>0.3.5</VersionPrefix>
     <VersionSuffix></VersionSuffix>
-    <AssemblyVersion>0.3.0.0</AssemblyVersion>
-    <FileVersion>0.3.0.0</FileVersion>
+    <AssemblyVersion>0.3.5.0</AssemblyVersion>
+    <FileVersion>0.3.5.0</FileVersion>
     <InformationalVersion Condition="'$(VersionSuffix)' == ''">$(VersionPrefix)</InformationalVersion>
     <InformationalVersion Condition="'$(VersionSuffix)' != ''">$(VersionPrefix)-$(VersionSuffix)</InformationalVersion>
+    <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="Product Metadata">

@@ -23,4 +23,9 @@
     <ProjectReference Include="..\P5CCS.Export\P5CCS.Export.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\LICENSE" LogicalName="P5CCS.App.Resources.License.txt" Link="Resources\License.txt" />
+    <EmbeddedResource Include="..\..\docs\THIRD-PARTY-NOTICES.md" LogicalName="P5CCS.App.Resources.ThirdPartyNotices.txt" Link="Resources\ThirdPartyNotices.txt" />
+  </ItemGroup>
+
 </Project>

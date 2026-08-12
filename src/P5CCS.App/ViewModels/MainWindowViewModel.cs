@@ -16,6 +16,7 @@ public partial class MainWindowViewModel : ObservableObject
     private readonly IPreferencesService _preferencesService;
     private readonly IThemeService _themeService;
     private readonly IDialogService _dialogService;
+    private readonly Func<AboutWindow> _aboutWindowFactory;
 
     private int _untitledCounter = 1;
 
@@ -23,11 +24,13 @@ public partial class MainWindowViewModel : ObservableObject
         IVersionService versionService,
         IPreferencesService preferencesService,
         IThemeService themeService,
-        IDialogService dialogService)
+        IDialogService dialogService,
+        Func<AboutWindow> aboutWindowFactory)
     {
         _preferencesService = preferencesService;
         _themeService = themeService;
         _dialogService = dialogService;
+        _aboutWindowFactory = aboutWindowFactory;
 
         VersionText = $"Processing 5 - Creative Coding Station v{versionService.InformationalVersion}";
         CurrentTheme = _preferencesService.Current.Theme;
@@ -235,12 +238,10 @@ public partial class MainWindowViewModel : ObservableObject
     private void SetSystemTheme() => CurrentTheme = AppTheme.System;
 
     [RelayCommand]
-    private static void ShowAbout()
+    private void ShowAbout()
     {
-        MessageBox.Show(
-            "Processing 5 - Creative Coding Station\nCopyright (c) 2026 Patrick JAILLET",
-            "About",
-            MessageBoxButton.OK,
-            MessageBoxImage.Information);
+        var aboutWindow = _aboutWindowFactory();
+        aboutWindow.Owner = Application.Current.MainWindow;
+        aboutWindow.ShowDialog();
     }
 }
