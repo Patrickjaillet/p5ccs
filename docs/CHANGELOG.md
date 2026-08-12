@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.2] - 2026-08-12
+
+### Fixed
+
+- **Root-caused the blank/white rendering bug from 0.6.1**: the actual
+  cause was never `WindowState` — it was the Explorer `LayoutAnchorablePane`
+  still present in `DockingManager` (the same AvalonDock anchorable-content
+  hosting defect noted as a "Known Issue" since 0.6.0, previously worked
+  around for Sliders/Console by moving them into `SketchTabView`). Its mere
+  presence in the layout, even fully collapsed/placeholder, corrupted
+  layout/paint for the whole window whenever `WindowState` was `Normal`.
+  Confirmed live: at `Normal` size the Explorer content rendered detached
+  and overlapping the sketch tab area instead of docked on the left.
+  The Explorer pane is now a plain `DockPanel` + `GridSplitter` next to
+  `DockingManager` (which now hosts only a `LayoutDocumentPane`, no
+  anchorable), matching the pattern already proven for Sliders/Console.
+  The forced-maximize-on-launch workaround from 0.6.1 is no longer needed
+  and has been removed — the app now renders correctly at any window state,
+  including a fresh launch at the default `Normal` size.
+
 ## [0.6.1] - 2026-08-12
 
 ### Fixed

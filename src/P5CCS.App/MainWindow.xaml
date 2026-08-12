@@ -13,7 +13,6 @@
                  x:Name="RootWindow"
                  Title="Processing 5 - Creative Coding Station"
                  Height="720" Width="1200"
-                 WindowState="Maximized"
                  ExtendsContentIntoTitleBar="True"
                  WindowBackdropType="Mica"
                  WindowCornerPreference="Round">
@@ -117,36 +116,54 @@
             </Button>
         </ToolBar>
 
-        <xcad:DockingManager Grid.Row="3"
-                              DocumentsSource="{Binding OpenSketches}"
-                              ActiveContent="{Binding SelectedSketch, Mode=TwoWay}">
-            <xcad:DockingManager.Theme>
-                <xcadThemes:WPFUITheme />
-            </xcad:DockingManager.Theme>
-            <xcad:DockingManager.LayoutItemContainerStyle>
-                <Style TargetType="{x:Type xcad:LayoutItem}">
-                    <Setter Property="Title" Value="{Binding Model.Title}" />
-                </Style>
-            </xcad:DockingManager.LayoutItemContainerStyle>
-            <xcad:DockingManager.LayoutItemTemplate>
-                <DataTemplate DataType="{x:Type vm:SketchTabViewModel}">
-                    <views:SketchTabView ShowGrid="{Binding DataContext.ShowGrid, ElementName=RootWindow}" />
-                </DataTemplate>
-            </xcad:DockingManager.LayoutItemTemplate>
-            <xcad:LayoutRoot>
-                <xcad:LayoutPanel Orientation="Horizontal">
-                    <xcad:LayoutAnchorablePane DockWidth="220">
-                        <xcad:LayoutAnchorable Title="Explorer" CanClose="False" CanAutoHide="True">
-                            <TextBlock Text="Project explorer — coming in a later phase."
-                                       TextWrapping="Wrap"
-                                       Margin="8"
-                                       Opacity="0.6" />
-                        </xcad:LayoutAnchorable>
-                    </xcad:LayoutAnchorablePane>
-                    <xcad:LayoutDocumentPane />
-                </xcad:LayoutPanel>
-            </xcad:LayoutRoot>
-        </xcad:DockingManager>
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="220" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <DockPanel Grid.Column="0">
+                <TextBlock DockPanel.Dock="Top"
+                           Text="Explorer"
+                           FontWeight="SemiBold"
+                           Margin="8,6"
+                           Opacity="0.8" />
+                <TextBlock Text="Project explorer — coming in a later phase."
+                           TextWrapping="Wrap"
+                           Margin="8"
+                           Opacity="0.6" />
+            </DockPanel>
+
+            <GridSplitter Grid.Column="1"
+                           Width="4"
+                           HorizontalAlignment="Stretch"
+                           VerticalAlignment="Stretch"
+                           Background="Transparent" />
+
+            <xcad:DockingManager Grid.Column="2"
+                                  DocumentsSource="{Binding OpenSketches}"
+                                  ActiveContent="{Binding SelectedSketch, Mode=TwoWay}">
+                <xcad:DockingManager.Theme>
+                    <xcadThemes:WPFUITheme />
+                </xcad:DockingManager.Theme>
+                <xcad:DockingManager.LayoutItemContainerStyle>
+                    <Style TargetType="{x:Type xcad:LayoutItem}">
+                        <Setter Property="Title" Value="{Binding Model.Title}" />
+                    </Style>
+                </xcad:DockingManager.LayoutItemContainerStyle>
+                <xcad:DockingManager.LayoutItemTemplate>
+                    <DataTemplate DataType="{x:Type vm:SketchTabViewModel}">
+                        <views:SketchTabView ShowGrid="{Binding DataContext.ShowGrid, ElementName=RootWindow}" />
+                    </DataTemplate>
+                </xcad:DockingManager.LayoutItemTemplate>
+                <xcad:LayoutRoot>
+                    <xcad:LayoutPanel Orientation="Horizontal">
+                        <xcad:LayoutDocumentPane />
+                    </xcad:LayoutPanel>
+                </xcad:LayoutRoot>
+            </xcad:DockingManager>
+        </Grid>
 
         <StatusBar Grid.Row="4">
             <StatusBarItem>
