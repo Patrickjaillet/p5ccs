@@ -52,6 +52,7 @@ public partial class MainWindowViewModel : ObservableObject
             ["Run"] = RunCommand,
             ["Stop"] = StopCommand,
             ["Reset"] = ResetCommand,
+            ["OpenExport"] = OpenExportCommand,
             ["QuickExport"] = QuickExportCommand,
             ["ToggleTheme"] = ToggleThemeCommand,
             ["FullscreenViewport"] = FullscreenViewportCommand,
@@ -240,6 +241,19 @@ public partial class MainWindowViewModel : ObservableObject
 
     [RelayCommand]
     private void Reset() => SelectedSketch?.Reset();
+
+    [RelayCommand]
+    private void OpenExport()
+    {
+        if (SelectedSketch is null)
+        {
+            return;
+        }
+
+        var viewModel = new ExportViewModel(SelectedSketch, _dialogService);
+        var window = new ExportWindow(viewModel) { Owner = Application.Current.MainWindow };
+        window.ShowDialog();
+    }
 
     [RelayCommand]
     private async Task QuickExport()

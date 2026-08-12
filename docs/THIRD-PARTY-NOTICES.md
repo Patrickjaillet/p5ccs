@@ -12,6 +12,12 @@ Copyright (c) 2026 Processing Foundation
 License: GNU Lesser General Public License v2.1 (LGPL-2.1)
 https://github.com/processing/p5.js
 
+## p5.sound.js (p5.js Sound addon, v1.0.1)
+
+Copyright (c) 2014-2026 Jason Sigal, Yotam Mann, and p5.js Sound contributors
+License: GNU Lesser General Public License v2.1 (LGPL-2.1)
+https://github.com/processing/p5.js-sound
+
 ## WPF-UI (lepoco/wpfui)
 
 Copyright (c) 2021-2025 Leszek Pomianowski and WPF UI Contributors
@@ -46,11 +52,21 @@ https://developer.microsoft.com/microsoft-edge/webview2/
 License: MIT License
 https://github.com/rosenbjerg/FFMpegCore
 
-## FFmpeg (embedded binary, bundled from Phase 8 onward)
+## FFmpeg (embedded binary, ffmpeg.exe, build n7.1.5)
 
-License: GNU Lesser General Public License v2.1+ (LGPL), or GNU General
-Public License v2+ (GPL) depending on the exact build configuration used.
+Copyright (c) FFmpeg developers
+License: GNU Lesser General Public License v3 (LGPL-3.0)
+Build: BtbN/FFmpeg-Builds "win64-lgpl" (static, LGPL-only codec set — notably
+excludes the GPL-only libx264/libx265; H.264 encoding uses the BSD-licensed
+Cisco OpenH264 encoder instead, matching the LGPL build's license terms)
 https://ffmpeg.org/legal.html
+https://github.com/BtbN/FFmpeg-Builds
+
+## OpenH264 (Cisco, linked by the embedded ffmpeg.exe for H.264/MP4 export)
+
+Copyright (c) Cisco Systems, Inc.
+License: BSD 2-Clause License
+https://github.com/cisco/openh264
 
 ## SixLabors.ImageSharp
 

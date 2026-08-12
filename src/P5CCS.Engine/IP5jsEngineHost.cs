@@ -31,4 +31,12 @@ public interface IP5jsEngineHost : IDisposable
     void SetGlobalNumber(string name, double value);
 
     Task<byte[]> CaptureScreenshotPngAsync();
+
+    Task BeginExportAsync();
+
+    Task<byte[]> CaptureExportFrameAsync(double virtualMillis);
+
+    Task EndExportAsync();
+
+    Task ResizeCanvasForExportAsync(int width, int height);
 }

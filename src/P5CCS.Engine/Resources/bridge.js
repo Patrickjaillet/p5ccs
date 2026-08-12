@@ -3,6 +3,10 @@
   var frameCount = 0;
   var fpsAccumMs = 0;
 
+  var realPerformanceNow = performance.now.bind(performance);
+  var virtualClockActive = false;
+  var virtualClockMs = 0;
+
   var gridEnabled = false;
   var gridSpacing = 50;
   var hudGridCanvas = document.getElementById('hud-grid');
@@ -159,6 +163,31 @@
         case 'showGrid':
           gridEnabled = !!data.value;
           drawGrid();
+          break;
+        case 'beginExport':
+          virtualClockActive = true;
+          virtualClockMs = 0;
+          performance.now = function () {
+            return virtualClockActive ? virtualClockMs : realPerformanceNow();
+          };
+          if (typeof noLoop === 'function') noLoop();
+          post({ type: 'exportBegan' });
+          break;
+        case 'captureFrame':
+          virtualClockMs = data.value;
+          if (typeof redraw === 'function') redraw();
+          post({ type: 'frameCaptured', value: data.value });
+          break;
+        case 'endExport':
+          virtualClockActive = false;
+          performance.now = realPerformanceNow;
+          post({ type: 'exportEnded' });
+          break;
+        case 'resizeCanvasForExport':
+          if (typeof resizeCanvas === 'function') {
+            resizeCanvas(data.width, data.height);
+          }
+          post({ type: 'canvasResizedForExport' });
           break;
         default:
           break;

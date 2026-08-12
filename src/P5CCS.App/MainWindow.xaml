@@ -65,7 +65,8 @@
                 <MenuItem Header="Re_set" Command="{Binding ResetCommand}" InputGestureText="Ctrl+F5" />
             </MenuItem>
             <MenuItem Header="E_xport">
-                <MenuItem Header="_Quick Export..." Command="{Binding QuickExportCommand}" InputGestureText="Ctrl+E" />
+                <MenuItem Header="_Export..." Command="{Binding OpenExportCommand}" InputGestureText="Ctrl+E" />
+                <MenuItem Header="_Quick Export (PNG)..." Command="{Binding QuickExportCommand}" />
             </MenuItem>
             <MenuItem Header="_Window">
                 <MenuItem Header="Close All Tabs" Command="{Binding CloseAllTabsCommand}" />
@@ -101,7 +102,7 @@
                 <ComboBoxItem Content="120" />
             </ComboBox>
             <Separator />
-            <Button Command="{Binding QuickExportCommand}" ToolTip="Quick Export">
+            <Button Command="{Binding OpenExportCommand}" ToolTip="Export">
                 <ui:SymbolIcon Symbol="ArrowExportUp24" />
             </Button>
             <Separator />

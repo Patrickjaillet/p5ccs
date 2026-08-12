@@ -9,4 +9,13 @@
     <ProjectReference Include="..\P5CCS.Core\P5CCS.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\..\resources\ffmpeg\ffmpeg.exe"
+          Link="tools\ffmpeg\ffmpeg.exe"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\resources\ffmpeg\LICENSE.txt"
+          Link="tools\ffmpeg\LICENSE.txt"
+          CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

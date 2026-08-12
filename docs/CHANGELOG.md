@@ -7,6 +7,70 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-08-13
+
+### Added
+
+- Full export system: a new "Export..." dialog (`ExportWindow`/`ExportViewModel`,
+  replacing "Quick Export" as the Ctrl+E default, which remains available as a
+  separate one-click PNG shortcut) supporting PNG, JPEG, GIF, WebM, and MP4,
+  with per-format quality controls, a destination-folder picker, an
+  auto-generated file name (`<sketch>_v<version>_<timestamp>.<ext>`), a
+  batch queue (add multiple jobs, run them sequentially), a progress bar
+  with ETA, and cancellation.
+- Deterministic offscreen frame capture (`P5CCS.Export.FrameCaptureService`):
+  drives the sketch via a virtualized clock (`bridge.js` replaces
+  `performance.now` during export) so exported motion is correct regardless
+  of how long each frame actually takes to capture — verified by unit tests
+  asserting the exact virtual-time sequence sent per frame.
+- `p5.sound.min.js` vendored locally (already added in 0.7.0) is now joined
+  by a vendored `ffmpeg.exe` (`resources/ffmpeg/`, BtbN win64-lgpl static
+  build, LGPL-3.0) and `FFMpegCore`/`SixLabors.ImageSharp`-backed exporters:
+  `GifExporter` (Octree quantization, infinite loop), `VideoExporter`
+  (WebM via `libvpx-vp9`; MP4 via `libopenh264` — the BSD-licensed Cisco
+  H.264 encoder, since the GPL-only `libx264` is absent from LGPL ffmpeg
+  builds), and `StillImageExporter` (PNG passthrough / JPEG re-encode).
+- New `P5CCS.App.Tests` project (previously missing) covering the export
+  file-naming convention and the full `ExportJobRunner` orchestration
+  (resize-before-capture, resize-back-after, cancellation mid-export).
+- `IP5jsEngineHost` gained `BeginExportAsync`/`CaptureExportFrameAsync`/
+  `EndExportAsync`/`ResizeCanvasForExportAsync`; `LocalSketchServer`-adjacent
+  export plumbing lives behind a new engine-agnostic `IExportFrameSource`
+  interface in `P5CCS.Export`, kept decoupled from WPF/WebView2 so the
+  capture/encode pipeline is independently unit-testable.
+- 34 new tests (20 `P5CCS.Export.Tests`, some already present pre-video +
+  new video/still/frame-capture tests, 12 new `P5CCS.App.Tests`) — 101
+  tests solution-wide. WebM and MP4 export are validated against the real
+  vendored `ffmpeg.exe`, producing genuinely decodable video files
+  (verified via `ffprobe`: correct codec, resolution, framerate, duration).
+
+### Fixed
+
+- Export resolution is now genuinely independent of the live viewport's
+  size, as the roadmap requires. Two real bugs were caught by end-to-end
+  UI testing (not just unit tests) and fixed: (1) `CapturePreviewAsync`
+  captures the WebView2 control's on-screen rendered pixels, which were
+  affected by the auto-fit `ZoomTransform` added in 0.6.3 — a requested
+  800×450 export came out at whatever the live-view scale happened to be
+  (e.g. 497×279). The zoom is now forced to 1:1 and the WebView2 host
+  control is itself resized to the export dimensions during capture, not
+  just the JS-side canvas. (2) That resize used logical WPF units while
+  `CapturePreviewAsync` captures physical device pixels — on a
+  DPI-scaled display (e.g. 150%) this produced a capture 1.5x larger than
+  requested. The resize now divides by `VisualTreeHelper.GetDpi`, and a
+  custom resolution (321×246) was confirmed to export pixel-exact through
+  the full running app.
+
+### Known Issues
+
+- The batch queue's `NumberBox` inputs (resolution) were observed, during
+  manual UI-automation testing, to sometimes not commit their displayed
+  text to the bound value on focus-loss alone (Tab/click-away) — pressing
+  Enter reliably commits. This may be a synthetic-input artifact rather
+  than a real user-facing bug (WPF-UI's `NumberBox` likely commits
+  correctly on genuine OS-level focus changes); flagged for a real-device
+  check rather than confirmed as broken for actual users.
+
 ## [0.7.0] - 2026-08-12
 
 ### Added

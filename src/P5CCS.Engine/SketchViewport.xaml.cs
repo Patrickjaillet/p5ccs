@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using Microsoft.Web.WebView2.Core;
 using P5CCS.Engine.Http;
 
@@ -21,6 +22,10 @@ public partial class SketchViewport : UserControl, IP5jsEngineHost, IDisposable
     private bool _isDisposed;
     private double _fitScale = 1.0;
     private double _userZoomMultiplier = 1.0;
+    private TaskCompletionSource? _exportBeganTcs;
+    private TaskCompletionSource? _frameCapturedTcs;
+    private TaskCompletionSource? _exportEndedTcs;
+    private TaskCompletionSource? _canvasResizedForExportTcs;
 
     public SketchViewport()
     {
@@ -116,6 +121,66 @@ public partial class SketchViewport : UserControl, IP5jsEngineHost, IDisposable
         using var stream = new MemoryStream();
         await WebView.CoreWebView2.CapturePreviewAsync(CoreWebView2CapturePreviewImageFormat.Png, stream);
         return stream.ToArray();
+    }
+
+    public Task BeginExportAsync()
+    {
+        _exportBeganTcs = new TaskCompletionSource();
+
+        // Capture must reflect the true resized canvas resolution, not the on-screen
+        // fit-to-container zoom applied for live viewing (CapturePreviewAsync captures
+        // the control's rendered pixels, which are affected by the LayoutTransform).
+        ZoomTransform.ScaleX = 1;
+        ZoomTransform.ScaleY = 1;
+
+        PostCommand("beginExport");
+        return _exportBeganTcs.Task;
+    }
+
+    public async Task<byte[]> CaptureExportFrameAsync(double virtualMillis)
+    {
+        _frameCapturedTcs = new TaskCompletionSource();
+        PostCommand("captureFrame", virtualMillis);
+        await _frameCapturedTcs.Task;
+        return await CaptureScreenshotPngAsync();
+    }
+
+    public Task EndExportAsync()
+    {
+        _exportEndedTcs = new TaskCompletionSource();
+        PostCommand("endExport");
+        return _exportEndedTcs.Task;
+    }
+
+    public async Task ResizeCanvasForExportAsync(int width, int height)
+    {
+        // The WebView2 control's browser viewport is sized by its WPF layout size
+        // (RenderRoot), independent of the sketch canvas' own logical resolution.
+        // Both must be resized together so the captured screenshot is genuinely
+        // width x height, not the viewport's fit-to-container display size.
+        //
+        // CapturePreviewAsync captures physical device pixels, while RenderRoot's
+        // Width/Height are logical WPF units; on a scaled display (e.g. 150% DPI)
+        // those differ, so the logical size must be divided by the DPI scale for
+        // the captured PNG to end up genuinely width x height pixels.
+        var dpiScale = VisualTreeHelper.GetDpi(this);
+        RenderRoot.Width = width / dpiScale.DpiScaleX;
+        RenderRoot.Height = height / dpiScale.DpiScaleY;
+        RenderRoot.UpdateLayout();
+        UpdateFitScale(new Size(ViewportContainer.ActualWidth, ViewportContainer.ActualHeight));
+        await Task.Delay(50);
+
+        _canvasResizedForExportTcs = new TaskCompletionSource();
+
+        if (WebView.CoreWebView2 is null)
+        {
+            _canvasResizedForExportTcs.TrySetResult();
+            return;
+        }
+
+        var payload = JsonSerializer.Serialize(new { command = "resizeCanvasForExport", width, height });
+        WebView.CoreWebView2.PostWebMessageAsJson(payload);
+        await _canvasResizedForExportTcs.Task;
     }
 
     private async void OnLoaded(object sender, RoutedEventArgs e)
@@ -223,6 +288,22 @@ public partial class SketchViewport : UserControl, IP5jsEngineHost, IDisposable
                 case "error":
                     var message = document.RootElement.GetProperty("message").GetString() ?? string.Empty;
                     Dispatcher.Invoke(() => ConsoleMessageReceived?.Invoke(this, message));
+                    break;
+
+                case "exportBegan":
+                    _exportBeganTcs?.TrySetResult();
+                    break;
+
+                case "frameCaptured":
+                    _frameCapturedTcs?.TrySetResult();
+                    break;
+
+                case "exportEnded":
+                    _exportEndedTcs?.TrySetResult();
+                    break;
+
+                case "canvasResizedForExport":
+                    _canvasResizedForExportTcs?.TrySetResult();
                     break;
             }
         }
