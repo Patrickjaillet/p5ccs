@@ -179,7 +179,7 @@ public partial class ExportViewModel : ObservableObject
 
                 try
                 {
-                    await _jobRunner.RunAsync(
+                    var encoderUsed = await _jobRunner.RunAsync(
                         _sketch.Engine,
                         item.Request,
                         DefaultCanvasWidth,
@@ -188,7 +188,7 @@ public partial class ExportViewModel : ObservableObject
                         _currentExportCts.Token);
 
                     item.Status = ExportQueueItemStatus.Completed;
-                    item.StatusText = "Completed";
+                    item.StatusText = encoderUsed is null ? "Completed" : $"Completed ({encoderUsed})";
                     item.ProgressFraction = 1;
                 }
                 catch (OperationCanceledException)

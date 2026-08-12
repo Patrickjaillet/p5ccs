@@ -56,9 +56,10 @@ https://github.com/rosenbjerg/FFMpegCore
 
 Copyright (c) FFmpeg developers
 License: GNU Lesser General Public License v3 (LGPL-3.0)
-Build: BtbN/FFmpeg-Builds "win64-lgpl" (static, LGPL-only codec set — notably
+Build: BtbN/FFmpeg-Builds "win64-lgpl" (x64) and "winarm64-lgpl" (ARM64,
+native — not x64 emulation), both static, LGPL-only codec set — notably
 excludes the GPL-only libx264/libx265; H.264 encoding uses the BSD-licensed
-Cisco OpenH264 encoder instead, matching the LGPL build's license terms)
+Cisco OpenH264 encoder instead, matching the LGPL build's license terms
 https://ffmpeg.org/legal.html
 https://github.com/BtbN/FFmpeg-Builds
 

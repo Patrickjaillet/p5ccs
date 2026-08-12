@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Microsoft.Web.WebView2.Core;
+using Microsoft.Web.WebView2.Wpf;
 using P5CCS.Engine.Http;
 
 namespace P5CCS.Engine;
@@ -191,6 +192,14 @@ public partial class SketchViewport : UserControl, IP5jsEngineHost, IDisposable
         }
 
         _isInitialized = true;
+
+        if (WebView2RuntimeLocator.FixedVersionRuntimePath is string fixedVersionPath)
+        {
+            WebView.CreationProperties = new CoreWebView2CreationProperties
+            {
+                BrowserExecutableFolder = fixedVersionPath,
+            };
+        }
 
         _server.Start();
         await WebView.EnsureCoreWebView2Async();

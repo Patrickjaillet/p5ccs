@@ -7,6 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-08-13
+
+### Added
+
+- GPU-accelerated video encoding with automatic CPU fallback:
+  `VideoExporter` now tries hardware encoders first (`h264_nvenc`,
+  `h264_amf`, `h264_qsv` for MP4; `vp9_qsv` for WebM) and falls through
+  to the existing CPU software encoder on failure, returning which
+  encoder actually succeeded. Verified end-to-end on real hardware: this
+  machine's NVIDIA GPU is detected by `ffmpeg` but its NVENC driver
+  stack is unavailable, genuinely exercising the fallback chain rather
+  than only the disabled-by-flag code path.
+- Native ARM64 `ffmpeg.exe` (BtbN `winarm64-lgpl` build) vendored
+  alongside the existing x64 one; `P5CCS.Export.csproj` now selects the
+  correct architecture's binary at build time based on `Platform`/
+  `RuntimeIdentifier`, verified to produce a clean ARM64 build with the
+  genuinely-native binary copied to output (not x64 under emulation).
+- `WebView2RuntimeLocator` (`P5CCS.Engine`): code-level support for a
+  bundled WebView2 Fixed Version Runtime — if a `WebView2Runtime` folder
+  with `msedgewebview2.exe` exists next to the app, it's preferred over
+  the system's Evergreen runtime. No runtime is bundled yet (that's
+  Phase 10's installer responsibility per the roadmap); this only adds
+  and tests the detection/fallback code.
+- `docs/KNOWN-LIMITATIONS.md`: an honest per-configuration limitations
+  log distinguishing what was verified on real hardware in this
+  environment (Windows 11 x64, a real second physical monitor, GPU
+  encoder fallback, transparency-disabled Mica degradation, clean ARM64
+  cross-compilation) from what could not be (real ARM64 execution,
+  Windows 10, the full 100–300% DPI range, high-contrast mode).
+- 7 new tests (4 `VideoExporter` GPU/fallback tests, 3
+  `WebView2RuntimeLocator` tests) — 108 tests solution-wide.
+
+### Fixed
+
+- Nothing broken by this phase's changes: full regression pass (build +
+  108 tests + live launch, including a real launch with Windows
+  transparency effects disabled) confirmed after every change.
+
 ## [0.8.0] - 2026-08-13
 
 ### Added

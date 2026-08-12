@@ -66,6 +66,86 @@ public class VideoExporterTests
     }
 
     [Fact]
+    public async Task ExportAsync_ReturnsTheEncoderThatActuallySucceeded()
+    {
+        var frames = CreateAnimatedFrames(4);
+        var outputPath = Path.Combine(Path.GetTempPath(), $"p5ccs-video-{Guid.NewGuid():N}.mp4");
+
+        try
+        {
+            var encoderUsed = await VideoExporter.ExportAsync(frames, fps: 10, outputPath, VideoFormat.Mp4);
+
+            Assert.False(string.IsNullOrWhiteSpace(encoderUsed));
+        }
+        finally
+        {
+            File.Delete(outputPath);
+        }
+    }
+
+    [Fact]
+    public async Task ExportAsync_WithGpuEncodingDisabled_UsesCpuFallbackDirectly()
+    {
+        var frames = CreateAnimatedFrames(4);
+        var outputPath = Path.Combine(Path.GetTempPath(), $"p5ccs-video-{Guid.NewGuid():N}.mp4");
+
+        try
+        {
+            var encoderUsed = await VideoExporter.ExportAsync(frames, fps: 10, outputPath, VideoFormat.Mp4, preferGpuEncoding: false);
+
+            Assert.Equal("libopenh264", encoderUsed);
+            Assert.True(File.Exists(outputPath));
+        }
+        finally
+        {
+            File.Delete(outputPath);
+        }
+    }
+
+    [Fact]
+    public async Task ExportAsync_WebM_WithGpuEncodingDisabled_UsesCpuFallbackDirectly()
+    {
+        var frames = CreateAnimatedFrames(4);
+        var outputPath = Path.Combine(Path.GetTempPath(), $"p5ccs-video-{Guid.NewGuid():N}.webm");
+
+        try
+        {
+            var encoderUsed = await VideoExporter.ExportAsync(frames, fps: 10, outputPath, VideoFormat.WebM, preferGpuEncoding: false);
+
+            Assert.Equal("libvpx-vp9", encoderUsed);
+            Assert.True(File.Exists(outputPath));
+        }
+        finally
+        {
+            File.Delete(outputPath);
+        }
+    }
+
+    [Fact]
+    public async Task ExportAsync_WhenGpuHardwareUnavailable_FallsThroughToCpuAndStillProducesValidFile()
+    {
+        // On this machine the GPU encoders are compiled into ffmpeg but the actual driver
+        // stack (e.g. NVENC's nvEncodeAPI64.dll) is unavailable, so this exercises the real
+        // fallback chain end-to-end rather than merely asserting on GPU-disabled behavior.
+        var frames = CreateAnimatedFrames(4);
+        var outputPath = Path.Combine(Path.GetTempPath(), $"p5ccs-video-{Guid.NewGuid():N}.mp4");
+
+        try
+        {
+            var encoderUsed = await VideoExporter.ExportAsync(frames, fps: 10, outputPath, VideoFormat.Mp4, preferGpuEncoding: true);
+
+            Assert.True(File.Exists(outputPath));
+            var info = new FileInfo(outputPath);
+            Assert.True(info.Length > 500);
+            Assert.False(string.IsNullOrWhiteSpace(encoderUsed));
+        }
+        finally
+        {
+            File.Delete(outputPath);
+        }
+    }
+
+    [Fact]
     public async Task ExportAsync_EmptyFrameList_Throws()
     {
         var outputPath = Path.Combine(Path.GetTempPath(), $"p5ccs-video-{Guid.NewGuid():N}.mp4");

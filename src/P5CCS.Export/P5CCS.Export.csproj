@@ -9,11 +9,16 @@
     <ProjectReference Include="..\P5CCS.Core\P5CCS.Core.csproj" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <_FFmpegArch Condition="'$(Platform)' == 'ARM64' Or '$(RuntimeIdentifier)' == 'win-arm64'">win-arm64</_FFmpegArch>
+    <_FFmpegArch Condition="'$(_FFmpegArch)' == ''">win-x64</_FFmpegArch>
+  </PropertyGroup>
+
   <ItemGroup>
-    <None Include="..\..\resources\ffmpeg\ffmpeg.exe"
+    <None Include="..\..\resources\ffmpeg\$(_FFmpegArch)\ffmpeg.exe"
           Link="tools\ffmpeg\ffmpeg.exe"
           CopyToOutputDirectory="PreserveNewest" />
-    <None Include="..\..\resources\ffmpeg\LICENSE.txt"
+    <None Include="..\..\resources\ffmpeg\$(_FFmpegArch)\LICENSE.txt"
           Link="tools\ffmpeg\LICENSE.txt"
           CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>

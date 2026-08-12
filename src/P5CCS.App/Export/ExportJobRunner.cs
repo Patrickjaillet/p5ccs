@@ -7,7 +7,7 @@ public sealed class ExportJobRunner
 {
     private readonly FrameCaptureService _frameCaptureService = new();
 
-    public async Task RunAsync(
+    public async Task<string?> RunAsync(
         IP5jsEngineHost engine,
         ExportRequest request,
         int? restoreWidth = null,
@@ -26,7 +26,7 @@ public sealed class ExportJobRunner
                 frames.Add(frame);
             }
 
-            await ExportFramesAsync(frames, request, cancellationToken);
+            return await ExportFramesAsync(frames, request, cancellationToken);
         }
         finally
         {
@@ -37,16 +37,25 @@ public sealed class ExportJobRunner
         }
     }
 
-    private static Task ExportFramesAsync(IReadOnlyList<byte[]> frames, ExportRequest request, CancellationToken cancellationToken)
+    private static async Task<string?> ExportFramesAsync(IReadOnlyList<byte[]> frames, ExportRequest request, CancellationToken cancellationToken)
     {
-        return request.Format switch
+        switch (request.Format)
         {
-            ExportFormat.Png => StillImageExporter.ExportAsync(frames[0], request.OutputPath, StillImageFormat.Png, cancellationToken: cancellationToken),
-            ExportFormat.Jpeg => StillImageExporter.ExportAsync(frames[0], request.OutputPath, StillImageFormat.Jpeg, request.JpegQuality, cancellationToken),
-            ExportFormat.Gif => GifExporter.ExportAsync(frames, request.Fps, request.OutputPath, request.GifColorCount, cancellationToken),
-            ExportFormat.WebM => VideoExporter.ExportAsync(frames, request.Fps, request.OutputPath, P5CCS.Export.VideoFormat.WebM, request.VideoConstantRateFactor, cancellationToken: cancellationToken),
-            ExportFormat.Mp4 => VideoExporter.ExportAsync(frames, request.Fps, request.OutputPath, P5CCS.Export.VideoFormat.Mp4, mp4BitrateKbps: request.Mp4BitrateKbps, cancellationToken: cancellationToken),
-            _ => throw new NotSupportedException($"Export format '{request.Format}' is not supported."),
-        };
+            case ExportFormat.Png:
+                await StillImageExporter.ExportAsync(frames[0], request.OutputPath, StillImageFormat.Png, cancellationToken: cancellationToken);
+                return null;
+            case ExportFormat.Jpeg:
+                await StillImageExporter.ExportAsync(frames[0], request.OutputPath, StillImageFormat.Jpeg, request.JpegQuality, cancellationToken);
+                return null;
+            case ExportFormat.Gif:
+                await GifExporter.ExportAsync(frames, request.Fps, request.OutputPath, request.GifColorCount, cancellationToken);
+                return null;
+            case ExportFormat.WebM:
+                return await VideoExporter.ExportAsync(frames, request.Fps, request.OutputPath, P5CCS.Export.VideoFormat.WebM, request.VideoConstantRateFactor, cancellationToken: cancellationToken);
+            case ExportFormat.Mp4:
+                return await VideoExporter.ExportAsync(frames, request.Fps, request.OutputPath, P5CCS.Export.VideoFormat.Mp4, mp4BitrateKbps: request.Mp4BitrateKbps, cancellationToken: cancellationToken);
+            default:
+                throw new NotSupportedException($"Export format '{request.Format}' is not supported.");
+        }
     }
 }
