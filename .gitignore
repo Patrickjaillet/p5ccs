@@ -41,3 +41,8 @@ logs/
 ## Installer output
 installers/windows/Output/
 dist/
+
+## Qt6 rewrite (CMake build tree)
+qt6/build/
+qt6/**/build/
+CMakeUserPresets.json

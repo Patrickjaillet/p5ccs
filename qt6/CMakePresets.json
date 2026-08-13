@@ -1,0 +1,21 @@
+{
+  "version": 6,
+  "configurePresets": [
+    {
+      "name": "msvc2022-x64",
+      "displayName": "MSVC 2022 x64 (Qt 6.11.1)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/msvc2022-x64",
+      "cacheVariables": {
+        "CMAKE_PREFIX_PATH": "C:/Qt/6.11.1/msvc2022_64",
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "msvc2022-x64",
+      "configurePreset": "msvc2022-x64"
+    }
+  ]
+}
