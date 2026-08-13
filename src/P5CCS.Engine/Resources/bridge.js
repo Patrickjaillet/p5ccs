@@ -104,10 +104,25 @@
     }
   }
 
+  // raf-hook.js (loaded before p5.min.js) already patched window.requestAnimationFrame
+  // and exposes this registration point — patching it here instead would be too late,
+  // since p5.js may capture its own reference to requestAnimationFrame at load time,
+  // before this script (loaded after p5.min.js) ever runs.
+  if (typeof window.__p5ccsOnFrame === 'function') {
+    window.__p5ccsOnFrame(reportFrame);
+  }
+
   window.addEventListener('resize', drawGrid);
 
   window.addEventListener('error', function (event) {
     post({ type: 'error', message: event.message + ' at ' + event.filename + ':' + event.lineno });
+  });
+
+  window.addEventListener('securitypolicyviolation', function (event) {
+    post({
+      type: 'error',
+      message: 'CSP violation: ' + event.violatedDirective + ' blocked ' + event.blockedURI,
+    });
   });
 
   var originalLog = console.log;
@@ -125,13 +140,6 @@
   var readyCheck = setInterval(function () {
     if (typeof p5 !== 'undefined' && p5.prototype) {
       clearInterval(readyCheck);
-
-      var originalRedraw = p5.prototype.redraw;
-      p5.prototype.redraw = function () {
-        originalRedraw.apply(this, arguments);
-        reportFrame();
-      };
-
       post({ type: 'ready' });
       setTimeout(drawGrid, 50);
     }
@@ -176,6 +184,7 @@
         case 'captureFrame':
           virtualClockMs = data.value;
           if (typeof redraw === 'function') redraw();
+          reportFrame();
           post({ type: 'frameCaptured', value: data.value });
           break;
         case 'endExport':

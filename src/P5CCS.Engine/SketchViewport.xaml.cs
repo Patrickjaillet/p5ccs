@@ -204,7 +204,52 @@ public partial class SketchViewport : UserControl, IP5jsEngineHost, IDisposable
         _server.Start();
         await WebView.EnsureCoreWebView2Async();
         WebView.CoreWebView2.WebMessageReceived += OnWebMessageReceived;
+
+        // Network isolation for sketch code: block every request that isn't this
+        // instance's own local server, enforced host-side (cannot be bypassed by
+        // anything the sketch's JS does, unlike a page-level CSP).
+        WebView.CoreWebView2.AddWebResourceRequestedFilter("*", CoreWebView2WebResourceContext.All);
+        WebView.CoreWebView2.WebResourceRequested += OnWebResourceRequested;
+
+        var settings = WebView.CoreWebView2.Settings;
+        settings.AreDefaultContextMenusEnabled = false;
+        settings.AreDefaultScriptDialogsEnabled = false;
+        settings.IsStatusBarEnabled = false;
+        settings.IsZoomControlEnabled = false;
+        settings.IsSwipeNavigationEnabled = false;
+#if !DEBUG
+        // DevTools would let a sketch author (or malicious sketch) escape the WebResourceRequested
+        // sandbox entirely by opening a raw network-capable console; only ever needed for engine
+        // development, so it stays available in Debug builds and is switched off for anything shipped.
+        settings.AreDevToolsEnabled = false;
+        settings.AreBrowserAcceleratorKeysEnabled = false;
+#endif
+
         UpdateFitScale(new Size(ViewportContainer.ActualWidth, ViewportContainer.ActualHeight));
+    }
+
+    private void OnWebResourceRequested(object? sender, CoreWebView2WebResourceRequestedEventArgs e)
+    {
+        if (!Uri.TryCreate(e.Request.Uri, UriKind.Absolute, out var uri))
+        {
+            return;
+        }
+
+        // blob:/data: are not network fetches (no host to exfiltrate to) — they're
+        // synchronous, in-process resolutions of content the page itself already holds
+        // (canvas.toBlob, Web Audio buffers, inline resources). p5.sound and WEBGL/canvas
+        // export paths rely on these internally, so they must pass through untouched.
+        if (uri.Scheme is "blob" or "data")
+        {
+            return;
+        }
+
+        if (uri.IsLoopback && uri.Port == _server.Port)
+        {
+            return;
+        }
+
+        e.Response = WebView.CoreWebView2.Environment.CreateWebResourceResponse(null, 403, "Forbidden", string.Empty);
     }
 
     public void Dispose()

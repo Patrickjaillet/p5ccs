@@ -78,3 +78,36 @@ be tested in the development environment used for this project.
   installer yet. Per the roadmap, bundling the actual runtime is Phase
   10's responsibility (the Inno Setup installer script); this phase only
   verified the Evergreen fallback path continues to work correctly.
+  Consequently, Phase 11's offline-network audit (v0.9.9-rc.1) cannot
+  claim zero runtime network dependency in the strictest sense: a target
+  machine with no WebView2 Evergreen Runtime already installed still
+  needs one before the app will run at all. Everything the *application*
+  itself serves at runtime (p5.js, p5.sound.js, fonts, FFmpeg binaries)
+  is embedded and local; this gap is specifically about the browser
+  engine WebView2 depends on, not about the app's own content.
+
+## Content-Security-Policy vs. WebView2 rendering (Phase 11)
+
+While hardening `LocalSketchServer` for Phase 11, adding a
+`Content-Security-Policy` response header — tried with the full intended
+policy, then narrowed down to just `default-src 'self'`, then just
+`default-src 'self' 'unsafe-eval'`, all with identical symptoms —
+reproducibly and silently broke `requestAnimationFrame`-driven rendering
+in this specific WebView2 environment: a sketch's `setup()` still ran
+(the canvas got created), but no subsequent frame was ever observed
+(reported FPS stayed 0, mouse position never updated), with zero console
+errors, zero `securitypolicyviolation` events, and no exceptions
+anywhere. This was isolated via `git stash`-based bisection down to "the
+mere presence of the header, regardless of directives" as the sole
+cause, independent of any `bridge.js` implementation detail. The
+underlying WebView2/Chromium mechanism responsible was never identified
+— it may be specific to the virtualized/remote environment this project
+was developed in. The security goal (preventing sketch code from
+exfiltrating data over the network) was instead achieved via
+`CoreWebView2.AddWebResourceRequestedFilter` / `WebResourceRequested`
+host-side request interception in `SketchViewport`, which does not
+exhibit this regression and cannot be bypassed by page-level script the
+way a CSP header theoretically could be circumvented by a browser bug.
+Anyone revisiting a page-level CSP header for this project in the future
+should be aware this failure mode exists and reproduces reliably in this
+environment.

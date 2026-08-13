@@ -35,6 +35,18 @@ public sealed class LocalSketchServer : IDisposable
         [".frag"] = "text/plain",
     };
 
+    // Network isolation (blocking a sketch from reaching any external host) is enforced
+    // by the WebView2 host itself via CoreWebView2.AddWebResourceRequestedFilter +
+    // WebResourceRequested in SketchViewport, not via a Content-Security-Policy header.
+    // A CSP header was tried here first, but — reproducibly, in isolation, regardless of
+    // its exact directives or which bridge.js frame-reporting strategy was in use —
+    // its mere presence silently broke requestAnimationFrame-driven rendering in this
+    // environment (draw() calls appeared to happen, since setup()'s canvas got created,
+    // but no further frame ever visibly advanced or got reported). Host-side request
+    // filtering achieves the same "no exfiltration" security property without that
+    // regression, and is arguably a stronger boundary anyway since it can't be bypassed
+    // by any page-level trick.
+
     private readonly HttpListener _listener;
     private readonly Func<string> _sketchSourceProvider;
     private CancellationTokenSource? _cancellationTokenSource;
@@ -95,7 +107,19 @@ public sealed class LocalSketchServer : IDisposable
                 break;
             }
 
-            _ = HandleRequestAsync(context);
+            try
+            {
+                // HandleRequestAsync is synchronous (no internal await), so an exception
+                // thrown by it propagates immediately, synchronously, right here — if left
+                // uncaught, it would unwind out of this method entirely and silently kill
+                // the whole accept loop's background Task, leaving every future connection
+                // hanging forever with no observable error. One bad request must not be
+                // able to take down the server for the rest of the app's lifetime.
+                _ = HandleRequestAsync(context);
+            }
+            catch (Exception)
+            {
+            }
         }
     }
 
@@ -121,9 +145,17 @@ public sealed class LocalSketchServer : IDisposable
                 body = EmbeddedEngineResource.ReadBytes("P5CCS.Engine.Resources.p5.sound.min.js");
                 contentType = "text/javascript; charset=utf-8";
                 break;
+            case "/raf-hook.js":
+                body = Encoding.UTF8.GetBytes(EmbeddedEngineResource.ReadText("P5CCS.Engine.Resources.raf-hook.js"));
+                contentType = "text/javascript; charset=utf-8";
+                break;
             case "/bridge.js":
                 body = Encoding.UTF8.GetBytes(EmbeddedEngineResource.ReadText("P5CCS.Engine.Resources.bridge.js"));
                 contentType = "text/javascript; charset=utf-8";
+                break;
+            case "/hud.css":
+                body = Encoding.UTF8.GetBytes(EmbeddedEngineResource.ReadText("P5CCS.Engine.Resources.hud.css"));
+                contentType = "text/css; charset=utf-8";
                 break;
             case "/sketch.js":
                 body = Encoding.UTF8.GetBytes(_sketchSourceProvider());
@@ -148,6 +180,7 @@ public sealed class LocalSketchServer : IDisposable
         context.Response.StatusCode = statusCode;
         context.Response.ContentType = contentType;
         context.Response.Headers.Add("Cache-Control", "no-store");
+        context.Response.Headers.Add("X-Content-Type-Options", "nosniff");
 
         try
         {

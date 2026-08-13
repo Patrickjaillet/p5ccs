@@ -7,6 +7,95 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.9-rc.1] - 2026-08-13
+
+### Added
+
+- Host-enforced network isolation for sketch code: `SketchViewport` now
+  registers `CoreWebView2.AddWebResourceRequestedFilter("*", ...)` and
+  blocks (403) every request that isn't loopback traffic to the sketch's
+  own `LocalSketchServer` instance, or a `blob:`/`data:` URI (used
+  internally by canvas/Web Audio operations, which never leave the
+  process). Verified with a real sketch: a same-origin `fetch('/sketch.js')`
+  succeeds (200), an external `fetch('https://example.com/')` fails with
+  `Failed to fetch`.
+- WebView2 hardening: `AreDefaultContextMenusEnabled`,
+  `AreDefaultScriptDialogsEnabled`, `IsStatusBarEnabled`, and
+  `IsZoomControlEnabled` disabled unconditionally; `AreDevToolsEnabled`
+  and `AreBrowserAcceleratorKeysEnabled` additionally disabled in Release
+  builds only (kept available in Debug for engine development) so a
+  sketch author can't pop DevTools and step around the network-isolation
+  filter above.
+- `raf-hook.js`, loaded before `p5.min.js`, patches
+  `window.requestAnimationFrame` at the earliest possible point and
+  exposes `window.__p5ccsOnFrame(callback)` so `bridge.js` can hook into
+  the render loop without racing p5.js's own load-time capture of
+  `requestAnimationFrame`.
+- `docs/KNOWN-LIMITATIONS.md` and this changelog now document the CSP
+  investigation below for future reference.
+
+### Fixed
+
+- A `Content-Security-Policy` response header on `LocalSketchServer`
+  silently broke `requestAnimationFrame`-driven rendering in this
+  WebView2 environment (canvas got created by `setup()`, but no frame
+  ever advanced or got reported — zero console errors, zero CSP
+  violations). Root-bisected via `git stash` down to "the mere presence
+  of the header," independent of its directives or of any bridge.js
+  implementation detail; the underlying WebView2/Chromium mechanism was
+  never identified. Resolved by dropping the CSP header entirely and
+  reaching the same "no exfiltration" property through host-side request
+  filtering instead (see "Added," above), which doesn't exhibit the
+  regression and is arguably a stronger boundary since it can't be
+  bypassed by any page-level script.
+
+### Known Issues / Verified
+
+- `dotnet test P5CCS.sln` passes all 108 tests (31 Core, 26 Editor, 15
+  Engine, 24 Export, 12 App) after the network-isolation and WebView2
+  hardening changes.
+- Re-ran the Phase 7 feature validation sketch (WEBGL, custom GLSL
+  shaders, p5.sound `Oscillator`/`SoundFile`, p5.dom `createDiv`/
+  `createButton`) against a freshly launched app with the new
+  `WebResourceRequested` filter and hardened WebView2 settings active;
+  all five checks (`webgl`, `shader`, `sound`, `dom`,
+  `oscillator-construct`) still report `true`, confirmed via UI
+  Automation reading the Console panel's actual rendered text — not
+  assumed from the code alone.
+- The full offline-network audit could not fully eliminate the WebView2
+  Evergreen Runtime dependency: no Fixed Version Runtime is vendored in
+  this repository (see 0.9.5's Known Issues and
+  `docs/KNOWN-LIMITATIONS.md`), so a machine without any Evergreen
+  WebView2 install still needs one for the app to run at all. Everything
+  the *application itself* fetches at runtime (p5.js, p5.sound.js,
+  fonts, FFmpeg binaries) is embedded and local; this limitation is
+  scoped strictly to the browser runtime WebView2 itself depends on.
+- Final license-compatibility pass over `docs/THIRD-PARTY-NOTICES.md`:
+  all listed licenses (MIT, LGPL-2.1, LGPL-3.0, Ms-PL, BSD-2-Clause,
+  Apache-2.0, WebView2 SDK terms, Six Labors Split License) remain
+  compatible with MIT distribution of the application itself; no new
+  third-party dependency was introduced in this phase.
+- End-to-end pipeline re-verified post-hardening: pasted a sketch,
+  opened the Export dialog, queued and ran a real export through the
+  full capture pipeline (`CaptureScreenshotPngAsync` →
+  `ExportJobRunner` → file write). Produced a genuine 801x450 PNG
+  (confirmed via file-header inspection, not just an exit code), with
+  the version-stamped filename correctly reading `v0.9.9-rc.1`. The
+  FFmpeg-based WebM/MP4 encoding path itself is unchanged since 0.9.0
+  and wasn't touched by this phase's network-isolation/hardening work
+  (which is scoped to `SketchViewport`/`LocalSketchServer`), so this
+  PNG-path run is the relevant regression check for what actually
+  changed.
+- Performance snapshot on this machine: idle `P5CCS.App.exe` working
+  set ~187 MB / private bytes ~155 MB right after launch (WebView2
+  process(es) included in the OS-reported total for the main process
+  tree); live viewport steady-state at 60 FPS per the in-app FPS
+  counter, matching pre-Phase-11 numbers — no observable regression
+  from the added `WebResourceRequested` interception on the per-frame
+  hot path (it only fires per HTTP request, not per rendered frame).
+- Feature freeze declared for v1.0.0.0: no further feature work is
+  planned before Phase 12's release preparation.
+
 ## [0.9.5] - 2026-08-13
 
 ### Added

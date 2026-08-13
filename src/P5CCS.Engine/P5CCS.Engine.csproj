@@ -21,6 +21,8 @@
     <EmbeddedResource Include="..\..\resources\p5js\p5.sound.min.js" LogicalName="P5CCS.Engine.Resources.p5.sound.min.js" Link="Resources\p5js\p5.sound.min.js" />
     <EmbeddedResource Include="Resources\index.html" LogicalName="P5CCS.Engine.Resources.index.html" />
     <EmbeddedResource Include="Resources\bridge.js" LogicalName="P5CCS.Engine.Resources.bridge.js" />
+    <EmbeddedResource Include="Resources\hud.css" LogicalName="P5CCS.Engine.Resources.hud.css" />
+    <EmbeddedResource Include="Resources\raf-hook.js" LogicalName="P5CCS.Engine.Resources.raf-hook.js" />
   </ItemGroup>
 
 </Project>
