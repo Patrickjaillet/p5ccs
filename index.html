@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Processing 5 - Creative Coding Station</title>
+<meta name="description" content="A native Windows creative-coding IDE for p5.js, built with C# / WPF / WPF-UI. Offline-first, zero network dependency." />
+<link rel="icon" type="image/png" href="favicon.png" />
+<style>
+  :root {
+    --bg: #f6f7fb;
+    --surface: #ffffff;
+    --text: #1b1d23;
+    --text-muted: #55596a;
+    --accent: #4f6df5;
+    --accent-text: #ffffff;
+    --border: #e2e4ec;
+    --code-bg: #eef0f8;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14151a;
+      --surface: #1c1e26;
+      --text: #eceef4;
+      --text-muted: #a3a7bb;
+      --accent: #7c93ff;
+      --accent-text: #101223;
+      --border: #2b2e3a;
+      --code-bg: #23253046;
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+    line-height: 1.55;
+  }
+
+  header {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 72px 24px 32px;
+    text-align: center;
+  }
+
+  header img.icon {
+    width: 96px;
+    height: 96px;
+    border-radius: 20px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  h1 {
+    font-size: 2.1rem;
+    margin: 20px 0 8px;
+  }
+
+  header p.tagline {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    max-width: 620px;
+    margin: 0 auto;
+  }
+
+  .cta-row {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 28px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 12px 22px;
+    border-radius: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    font-size: 0.95rem;
+    border: 1px solid var(--border);
+  }
+
+  .btn.primary {
+    background: var(--accent);
+    color: var(--accent-text);
+    border-color: transparent;
+  }
+
+  .btn.secondary {
+    background: var(--surface);
+    color: var(--text);
+  }
+
+  main {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+
+  section {
+    margin-top: 56px;
+  }
+
+  section h2 {
+    font-size: 1.4rem;
+    margin-bottom: 18px;
+  }
+
+  .shots {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  @media (min-width: 720px) {
+    .shots { grid-template-columns: 1fr 1fr; }
+  }
+
+  .shots img {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    display: block;
+  }
+
+  ul.features {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  @media (min-width: 640px) {
+    ul.features { grid-template-columns: 1fr 1fr; }
+  }
+
+  ul.features li {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    font-size: 0.95rem;
+  }
+
+  ul.features li strong {
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  code {
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 0.9em;
+  }
+
+  .install-note {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-top: 10px;
+  }
+
+  footer {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 32px 24px 60px;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    text-align: center;
+    border-top: 1px solid var(--border);
+  }
+
+  footer a {
+    color: var(--text-muted);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <img class="icon" src="favicon.png" alt="Processing 5 - Creative Coding Station icon" />
+  <h1>Processing 5 - Creative Coding Station</h1>
+  <p class="tagline">
+    A native Windows creative-coding IDE for
+    <a href="https://p5js.org/" target="_blank" rel="noopener">p5.js</a>,
+    built with C# / WPF / WPF-UI. Offline-first — the p5.js runtime, code
+    editor, and export pipeline all run locally with zero network
+    dependency.
+  </p>
+  <div class="cta-row">
+    <a class="btn primary" href="https://github.com/Patrickjaillet/p5ccs/releases/latest">Download for Windows</a>
+    <a class="btn secondary" href="https://github.com/Patrickjaillet/p5ccs">View on GitHub</a>
+  </div>
+  <p class="install-note">Windows 10/11, x64 or ARM64 — per-user install, no administrator rights required.</p>
+</header>
+
+<main>
+  <section>
+    <h2>Screenshots</h2>
+    <div class="shots">
+      <img src="screenshot1.png" alt="P5CCS viewport and code editor" />
+      <img src="screenshot2.png" alt="P5CCS sliders panel and export dialog" />
+    </div>
+  </section>
+
+  <section>
+    <h2>Features</h2>
+    <ul class="features">
+      <li>
+        <strong>Fluent-themed interface</strong>
+        WPF-UI with Mica/Acrylic and light/dark/system theming.
+      </li>
+      <li>
+        <strong>Offline sketch viewport</strong>
+        Embedded WebView2, p5.js and p5.sound vendored locally, served over
+        a loopback-only local server — no CDN, no network calls.
+      </li>
+      <li>
+        <strong>Full code editor</strong>
+        AvalonEdit with p5.js-aware syntax highlighting, folding,
+        autocomplete, and inline error markers.
+      </li>
+      <li>
+        <strong>Intelligent sliders</strong>
+        Live numeric-literal-to-UI binding, with presets and per-slider
+        animation.
+      </li>
+      <li>
+        <strong>Full p5.js API coverage</strong>
+        2D, WEBGL, Sound, <code>p5.Vector</code>/<code>p5.Table</code>,
+        custom GLSL shaders, DOM, plus a searchable offline API reference.
+      </li>
+      <li>
+        <strong>Deterministic export pipeline</strong>
+        WebM, MP4, GIF, PNG/JPEG, with GPU-accelerated encoding where
+        available and automatic CPU fallback.
+      </li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Get started</h2>
+    <p>
+      Download the installer for your architecture from the
+      <a href="https://github.com/Patrickjaillet/p5ccs/releases/latest">latest release</a>.
+      Building from source and licensing details are documented in the
+      repository's
+      <a href="https://github.com/Patrickjaillet/p5ccs/blob/main/docs/COMPILATION.md">COMPILATION.md</a>.
+    </p>
+  </section>
+</main>
+
+<footer>
+  <p>
+    Processing 5 - Creative Coding Station — MIT Licensed — Copyright &copy; 2026 Patrick JAILLET.
+  </p>
+  <p>
+    <a href="https://github.com/Patrickjaillet/p5ccs">Repository</a> ·
+    <a href="https://github.com/Patrickjaillet/p5ccs/blob/main/docs/CHANGELOG.md">Changelog</a> ·
+    <a href="https://github.com/Patrickjaillet/p5ccs/releases">Releases</a>
+  </p>
+</footer>
+
+</body>
+</html>
