@@ -17,10 +17,15 @@
 #endif
 
 #define MyAppName "Processing 5 - Creative Coding Station"
-#define MyAppVersion "0.9.5"
+#define MyAppExeName "P5CCS.App.exe"
+
+; Read the version straight off the published binary's own file version
+; resource (set from Directory.Build.props at build time) instead of
+; duplicating it here by hand, where it would silently drift out of sync.
+#define MyAppVersion GetVersionNumbersString(PublishDir + "\" + MyAppExeName)
+
 #define MyAppPublisher "Patrick JAILLET"
 #define MyAppURL "https://patrickjaillet.github.io/p5ccs"
-#define MyAppExeName "P5CCS.App.exe"
 
 ; A bundled WebView2 Fixed Version Runtime is optional: if present at this
 ; path (populated separately, see docs/KNOWN-LIMITATIONS.md), it's deployed
@@ -36,7 +41,12 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={autopf}\{#MyAppName}
+; Per-user install (no admin/UAC elevation required), matching the pattern
+; used by e.g. Visual Studio Code's "User Installer" — appropriate here
+; since P5CCS is a single-user creative tool with no system-wide component
+; (no services, no shared program data, no all-users registration needed).
+PrivilegesRequired=lowest
+DefaultDirName={localappdata}\Programs\{#MyAppName}
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
 OutputDir=..\..\dist

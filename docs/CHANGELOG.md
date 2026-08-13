@@ -7,6 +7,61 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0.0] - 2026-08-13
+
+First stable release. Everything below is new since `0.9.9-rc.1`; see
+earlier entries in this file for the full feature history leading up to
+this milestone.
+
+### Added
+
+- Nothing feature-level: this release is exclusively the release-engineering
+  work needed to go from release-candidate to a shippable 1.0 (below).
+
+### Changed
+
+- Version bumped to `1.0.0.0` throughout: `Directory.Build.props`
+  (`VersionPrefix`/`AssemblyVersion`/`FileVersion`), and `README.md`'s
+  badge. Verified end-to-end by reading the compiled `P5CCS.App.exe`'s
+  actual `FileVersionInfo` (`FileVersion: 1.0.0.0`, `ProductVersion: 1.0.0`)
+  rather than assuming the MSBuild property flowed through correctly.
+- `installers/windows/setup.iss` no longer hardcodes its version string —
+  `MyAppVersion` is now read directly off the published executable's file
+  version resource via ISPP's `GetVersionNumbersString`, so it can never
+  drift out of sync with `Directory.Build.props` again (a hardcoded
+  `"0.9.5"` was caught still present here during this release, silently
+  three releases stale).
+- The installer now performs a per-user install (`PrivilegesRequired=lowest`,
+  installs to `%LocalAppData%\Programs\...`) instead of requiring
+  administrator elevation. Found via real end-to-end installer testing: a
+  UAC consent prompt has no way to be answered in a non-interactive
+  session, which silently hung and then auto-denied the install (Inno
+  Setup exit code 2) — the same failure mode a scripted/unattended
+  deployment would hit. Switched to the per-user pattern Visual Studio
+  Code's "User Installer" uses, which needs no elevation at all and is a
+  better fit anyway since P5CCS has no system-wide component to register.
+
+### Known Issues / Verified
+
+- Both installers (`P5CCS-Setup-1.0.0.0-x64.exe`,
+  `P5CCS-Setup-1.0.0.0-arm64.exe`) were compiled for real against genuine
+  self-contained `dotnet publish` output for each architecture; the ARM64
+  publish output's `P5CCS.App.exe` and bundled `ffmpeg.exe` were both
+  confirmed to be native ARM64 PE binaries (not x64-under-emulation).
+- The x64 installer was silently installed end-to-end with the new
+  per-user flow (no elevation prompt), the installed `P5CCS.App.exe`
+  launched from its real install location and confirmed running (FPS: 60
+  via UI Automation), then silently uninstalled with a confirmed complete
+  removal of the install directory.
+- `dotnet test P5CCS.sln -c Release -p:Platform=x64` passes all 108 tests.
+- ARM64 real-hardware execution and Windows 10 compatibility remain
+  unverified in this development environment, as documented since Phase 9
+  in `docs/KNOWN-LIMITATIONS.md` — this has not changed for 1.0.0.0, and
+  is called out explicitly here rather than silently glossed over for the
+  stable release.
+- Feature freeze (declared in `0.9.9-rc.1`) held: no feature-level changes
+  in this release, only release engineering.
+
 ## [0.9.9-rc.1] - 2026-08-13
 
 ### Added

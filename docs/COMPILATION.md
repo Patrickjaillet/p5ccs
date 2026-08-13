@@ -69,13 +69,21 @@ The Inno Setup 7 script is at `installers/windows/setup.iss`. Publish first
 & "C:\Program Files\Inno Setup 7\ISCC.exe" /DAppArch=arm64 installers\windows\setup.iss
 ```
 
-Both produce `dist\P5CCS-Setup-<version>-<arch>.exe`. The installer bundles
-a WebView2 Fixed Version Runtime automatically if one is present at
-`resources/webview2runtime/win-<arch>/` at compile time (see
-[`docs/KNOWN-LIMITATIONS.md`](KNOWN-LIMITATIONS.md) — none is vendored yet,
-so installs currently fall back to the system's Evergreen WebView2 Runtime,
-which `WebView2RuntimeLocator` detects and prefers automatically once a
-Fixed Version Runtime folder is added).
+Both produce `dist\P5CCS-Setup-<version>-<arch>.exe`, where `<version>` is
+read directly off the published `P5CCS.App.exe`'s own file version resource
+(set from `Directory.Build.props`) rather than duplicated by hand in the
+script. The installer bundles a WebView2 Fixed Version Runtime automatically
+if one is present at `resources/webview2runtime/win-<arch>/` at compile time
+(see [`docs/KNOWN-LIMITATIONS.md`](KNOWN-LIMITATIONS.md) — none is vendored
+yet, so installs currently fall back to the system's Evergreen WebView2
+Runtime, which `WebView2RuntimeLocator` detects and prefers automatically
+once a Fixed Version Runtime folder is added).
+
+The installer performs a per-user install (`PrivilegesRequired=lowest`,
+installing to `%LocalAppData%\Programs\...`) and never requires
+administrator elevation or a UAC prompt, the same pattern Visual Studio
+Code's "User Installer" uses — appropriate since P5CCS has no system-wide
+component to register.
 
 ## Notes
 

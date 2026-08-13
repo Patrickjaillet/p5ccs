@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/Patrickjaillet/p5ccs/actions/workflows/ci.yml/badge.svg)](https://github.com/Patrickjaillet/p5ccs/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-0.9.5-blue.svg)](docs/CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](docs/CHANGELOG.md)
 
 A native Windows creative-coding IDE for [p5.js](https://p5js.org/), built with
 C# / WPF / WPF-UI. Offline-first: the p5.js runtime, the code editor, and the
@@ -10,8 +10,7 @@ export pipeline all run locally with zero network dependency.
 
 ## Features
 
-> Under active development — see [docs/CHANGELOG.md](docs/CHANGELOG.md) for
-> the full release history.
+See [docs/CHANGELOG.md](docs/CHANGELOG.md) for the full release history.
 
 - Fluent-themed WPF-UI interface (Mica/Acrylic, light/dark/system)
 - Embedded WebView2 viewport, offline (p5.js and p5.sound vendored locally,
@@ -46,6 +45,13 @@ Windows installers (x64 and native ARM64) are built with Inno Setup 7 from
 [docs/COMPILATION.md](docs/COMPILATION.md#building-the-windows-installer).
 Prebuilt installers are published on the
 [Releases](https://github.com/Patrickjaillet/p5ccs/releases) page.
+
+Requires Windows 10 (1809+) or Windows 11, x64 or ARM64, and the
+[Microsoft Edge WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2/)
+(pre-installed on current Windows 11; the installer will prompt for it on
+older systems that don't already have it) — see
+[docs/KNOWN-LIMITATIONS.md](docs/KNOWN-LIMITATIONS.md) for exactly what has
+and hasn't been verified on real hardware for each configuration.
 
 ## Contributing
 
