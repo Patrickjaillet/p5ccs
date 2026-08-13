@@ -43,8 +43,8 @@ in the project roadmap for the full checklist.
   required Qt DLLs alongside it, **genuinely launches**: verified via UI
   Automation reading the real window title
   ("Processing 5 - Creative Coding Station"), the splitter containing the
-  editor and viewport placeholder widgets, the status bar text ("Ready"),
-  and the version label. The code editor widget (`QPlainTextEdit`-based)
+  editor and viewport widgets, the status bar text ("Ready"), and the
+  version label. The code editor widget (`QPlainTextEdit`-based)
   was confirmed to genuinely accept and hold text input via
   `ValuePattern.SetValue`/`.Current.Value`, not just assumed to work from
   the widget existing.
@@ -57,20 +57,68 @@ in the project roadmap for the full checklist.
   the same quirk does not affect the `.NET`/`dotnet test` suite for the
   legacy app, which uses a different test runner mechanism entirely).
 
-## Known gaps (explicitly not done yet — foundation stage only)
+## QtWebEngine viewport — done and verified
 
-- **QtWebEngine is not installed** in this machine's Qt distribution
-  (only `Core`, `Gui`, `Widgets`, `Multimedia`, `Network`, `Svg`, `Qml`,
-  and a handful of others are present under
-  `C:/Qt/6.11.1/msvc2022_64/lib/cmake/`). The sketch viewport
-  (`p5ccs::engine::SketchViewportWidget`) is currently a placeholder
-  `QLabel`, not a real p5.js host. Getting `QWebEngineView` working is a
-  prerequisite for any real viewport work and needs the QtWebEngine
-  module installed via the Qt Maintenance Tool first.
-- **No local HTTP server** equivalent to `LocalSketchServer` exists yet —
-  needed once `QWebEngineView` is available, to serve the embedded p5.js
-  runtime and sketch code the same offline, loopback-only way the WPF app
-  does.
+**Update**: QtWebEngine is now installed (`extensions.qtwebengine.6111.win64_msvc2022_64`,
+matching this machine's Qt 6.11.1 exactly, via
+`MaintenanceTool.exe install ... --confirm-command`), and
+`SketchViewportWidget` now hosts a real `QWebEngineView` loading p5.js
+content through a custom `p5ccs://` URL scheme
+(`SketchUrlSchemeHandler`), serving `index.html` and the embedded
+`p5.min.js` from Qt resources, plus a dynamically-generated `sketch.js`
+via a callback (the same shape as the legacy `LocalSketchServer`'s
+`Func<string>` sketch source provider). This is a genuinely stronger
+security posture than the legacy loopback HTTP server: there is no
+listening socket at all, on any interface, so a sketch has nothing to
+discover or connect to beyond what request interception already
+prevents.
+
+Verified for real (not just "it compiles"), via Chrome DevTools Protocol
+over `QTWEBENGINE_REMOTE_DEBUGGING`, from a from-scratch clean rebuild:
+`typeof p5 !== 'undefined'` is `true`, a `<canvas>` element exists, and
+`frameCount` genuinely advances between two checks a second and a half
+apart — the sketch's `draw()` loop is actually running continuously, not
+just rendering once.
+
+**Debugging note for future reference**: the first attempt failed with
+`ERR_FILE_NOT_FOUND` for every request. Root cause was two independent
+bugs, found by bisection:
+1. `QWebEngineUrlScheme::LocalScheme`/`LocalAccessAllowed` flags tell
+   Chromium the scheme resolves to real filesystem paths (like `file://`)
+   — with a scheme that has no such backing files, every request fails
+   before ever reaching the registered handler. Fixed by using only
+   `SecureScheme | CorsEnabled`.
+2. Separately, CMake's `qt_add_resources(... FILES resources/index.html
+   ...)` without an explicit `BASE` directory aliases the resource by its
+   path *relative to the CMakeLists.txt*, i.e. `resources/index.html`,
+   not `index.html` — so `QFile(":/p5ccs/engine/index.html")` in the
+   handler was silently failing to open (`job->fail(UrlNotFound)`, which
+   Chromium also reports as `ERR_FILE_NOT_FOUND`, identical to bug #1's
+   symptom). Fixed by adding `BASE "${CMAKE_CURRENT_SOURCE_DIR}/resources"`
+   to the `qt_add_resources` call. A temporary file-based trace inside
+   `requestStarted` (since this environment's stdout capture for freshly
+   spawned native processes is unreliable — see the Qt Test note above)
+   was what separated these two causes: it proved the handler *was*
+   being invoked with the right path once bug #1 was fixed, narrowing
+   the remaining `ERR_FILE_NOT_FOUND` down to the resource lookup itself.
+
+## Known gaps (explicitly not done yet)
+
+- **No network isolation for sketch-issued requests yet.** The custom
+  scheme itself has no network access by construction, which covers
+  top-level navigation, but the legacy app's
+  `WebResourceRequested`-based interception of everything a sketch's own
+  JS might `fetch()` has no Qt6 equivalent yet — needed before this can
+  be considered equivalent to the legacy app's security posture, not
+  just its rendering.
+- **No FPS/console/mouse reporting back to the host** — the legacy
+  `bridge.js` → `WebMessageReceived` channel isn't ported. There is
+  currently no way for `MainWindow` to show a live FPS counter or route
+  sketch `console.log` calls to a UI console panel.
+- **No export frame capture** — the legacy `CaptureScreenshotPngAsync`/
+  `beginExport`/`captureFrame` protocol isn't ported.
+- **No p5.sound** — only `p5.min.js` is embedded so far, not
+  `p5.sound.min.js`.
 - **No p5.js-aware editor features** (syntax highlighting, folding,
   autocomplete, inline error markers) — `CodeEditorWidget` is currently
   bare `QPlainTextEdit`. `QSyntaxHighlighter` vs. `QScintilla` still needs
